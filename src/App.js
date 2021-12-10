@@ -1,26 +1,19 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 import PdfRenderer from './pdf-renderer';
+import PdfPage from './PdfPage';
 import './App.css';
 
 function App() {
-  const canvasRef = useRef();
+  const [pdfRenderer, setPdfRenderer] = useState(null);
 
   async function onFileChange(files) {
     if (files.length === 0) return;
 
     const pdfBytes = await files[0].arrayBuffer();
-
-    const pr = new PdfRenderer();
+    const pr = new PdfRenderer(window.devicePixelRatio);
     await pr.load(pdfBytes);
 
-    const firstPageDimensions = await pr.getPageDimensions(1);
-    const { width, height } = firstPageDimensions;
-
-    canvasRef.current.width = width;
-    canvasRef.current.height = height;
-
-    const canvasContext = canvasRef.current.getContext('2d');
-    await pr.renderPage(1, canvasContext);
+    setPdfRenderer(pr);
   }
 
   return (
@@ -32,11 +25,7 @@ function App() {
         onChange={(e) => onFileChange(e.target.files)}
       />
       <br />
-      <canvas
-        ref={canvasRef}
-      // width={width}
-      // height={height}
-      />
+      {pdfRenderer && <PdfPage width="600" render={pdfRenderer.renderPage.bind(pdfRenderer, 1)} />}
     </div>
   );
 }
