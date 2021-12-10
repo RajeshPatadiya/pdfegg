@@ -6,8 +6,8 @@ export default class PdfRenderer {
     }
 
     async load(pdfBytes) {
-        const task = pdfjs.getDocument(pdfBytes);
-        this.pdf = await task.promise;
+        const loadingTask = pdfjs.getDocument(pdfBytes);
+        this.pdf = await loadingTask.promise;
     }
 
     async getPageDimensions(pageNum) {
@@ -22,10 +22,11 @@ export default class PdfRenderer {
     async renderPage(pageNum, canvasContext) {
         const page = await this.pdf.getPage(pageNum);
         const viewport = page.getViewport({ scale: 1 });
-        page.render({
+        const renderTask = page.render({
             canvasContext: canvasContext,
             transform: null,
             viewport: viewport,
         });
+        await renderTask.promise;
     }
 }
