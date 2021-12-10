@@ -25,8 +25,36 @@ function App() {
         onChange={(e) => onFileChange(e.target.files)}
       />
       <br />
-      {pdfRenderer && <PdfPage width="600" render={pdfRenderer.renderPage.bind(pdfRenderer, 1)} />}
+      {pdfRenderer && <PdfViewer pdfRenderer={pdfRenderer} />}
     </div>
+  );
+}
+
+function PdfViewer({ pdfRenderer }) {
+  const [pageNumber, setPageNumber] = useState(1);
+
+  const hasPrev = pageNumber > 1;
+  function prevPage() {
+    if (hasPrev) {
+      setPageNumber(p => p - 1);
+    }
+  }
+
+  const hasNext = pageNumber < pdfRenderer.pageCount;
+  function nextPage() {
+    if (hasNext) {
+      setPageNumber(p => p + 1);
+    }
+  }
+
+  return (
+    <>
+      <p>{pageNumber} / {pdfRenderer.pageCount}</p>
+      <button disabled={!hasPrev} onClick={prevPage}>Prev</button>
+      <button disabled={!hasNext} onClick={nextPage}>Next</button>
+      <br />
+      <PdfPage width="600" render={pdfRenderer.renderPage.bind(pdfRenderer, pageNumber)} />
+    </>
   );
 }
 

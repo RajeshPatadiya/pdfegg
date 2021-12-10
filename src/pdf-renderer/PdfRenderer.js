@@ -11,6 +11,10 @@ export default class PdfRenderer {
         this.pdf = await loadingTask.promise;
     }
 
+    get pageCount() {
+        return this.pdf.numPages;
+    }
+
     async getPageDimensions(pageNum) {
         const page = await this.pdf.getPage(pageNum);
         const viewport = page.getViewport({ scale: 1 });
