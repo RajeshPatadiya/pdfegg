@@ -1,22 +1,31 @@
 import pdfjs from './pdfjsSetup';
 
 export default class PdfRenderer {
+    #pdf;
+    #id;
+    #devicePixelRatio;
+
     constructor(devicePixelRatio) {
-        this.pdf = null;
-        this.devicePixelRatio = devicePixelRatio || 1;
+        this.#pdf = null;
+        this.#devicePixelRatio = devicePixelRatio || 1;
     }
 
     async load(pdfBytes) {
         const loadingTask = pdfjs.getDocument(pdfBytes);
-        this.pdf = await loadingTask.promise;
+        this.#pdf = await loadingTask.promise;
+        this.#id = loadingTask.docId;
+    }
+
+    get id() {
+        return this.#id;
     }
 
     get pageCount() {
-        return this.pdf.numPages;
+        return this.#pdf.numPages;
     }
 
     async getPageDimensions(pageNum) {
-        const page = await this.pdf.getPage(pageNum);
+        const page = await this.#pdf.getPage(pageNum);
         const viewport = page.getViewport({ scale: 1 });
         return {
             width: viewport.width,
@@ -25,14 +34,14 @@ export default class PdfRenderer {
     }
 
     async renderPage(pageNum, canvas) {
-        const page = await this.pdf.getPage(pageNum);
+        const page = await this.#pdf.getPage(pageNum);
         const viewport = page.getViewport({ scale: 1 });
         const aspectRatio = viewport.width / viewport.height;
 
         const containerWidth = parseFloat(canvas.style.width);
         const containerHeight = containerWidth / aspectRatio;
 
-        const dpr = this.devicePixelRatio;
+        const dpr = this.#devicePixelRatio;
         canvas.width = containerWidth * dpr;
         canvas.height = containerHeight * dpr;
 

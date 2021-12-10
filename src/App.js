@@ -25,7 +25,7 @@ function App() {
         onChange={(e) => onFileChange(e.target.files)}
       />
       <br />
-      {pdfRenderer && <PdfViewer pdfRenderer={pdfRenderer} />}
+      {pdfRenderer && <PdfViewer key={pdfRenderer.id} pdfRenderer={pdfRenderer} />}
     </div>
   );
 }
