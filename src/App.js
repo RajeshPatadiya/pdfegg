@@ -1,9 +1,13 @@
 import { useState } from 'react';
+import download from 'downloadjs';
+
 import PdfRenderer from './pdf-renderer';
 import PdfPage from './PdfPage';
+import generateModifiedPdf from './generateModifiedPdf';
 import './App.css';
 
 function App() {
+  const [pdfBytes, setPdfBytes] = useState(null);
   const [pdfRenderer, setPdfRenderer] = useState(null);
 
   async function onFileChange(files) {
@@ -13,6 +17,7 @@ function App() {
     const pr = new PdfRenderer(window.devicePixelRatio);
     await pr.load(pdfBytes);
 
+    setPdfBytes(pdfBytes);
     setPdfRenderer(pr);
   }
 
@@ -24,9 +29,16 @@ function App() {
         accept=".pdf"
         onChange={(e) => onFileChange(e.target.files)}
       />
+      <button
+        disabled={pdfBytes === null}
+        onClick={async (e) => {
+          const outputBytes = await generateModifiedPdf(pdfBytes);
+          download(outputBytes, 'example.pdf', 'application/pdf');
+        }}
+      >Download</button>
       <br />
       {pdfRenderer && <PdfViewer key={pdfRenderer.id} pdfRenderer={pdfRenderer} />}
-    </div>
+    </div >
   );
 }
 
