@@ -3,11 +3,9 @@ import pdfjs from './pdfjsSetup';
 export default class PdfRenderer {
     #pdf;
     #id;
-    #devicePixelRatio;
 
-    constructor(devicePixelRatio) {
+    constructor() {
         this.#pdf = null;
-        this.#devicePixelRatio = devicePixelRatio || 1;
     }
 
     async load(pdfBytes) {

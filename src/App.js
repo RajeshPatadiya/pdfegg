@@ -14,7 +14,7 @@ function App() {
     if (files.length === 0) return;
 
     const pdfBytes = await files[0].arrayBuffer();
-    const pr = new PdfRenderer(window.devicePixelRatio);
+    const pr = new PdfRenderer();
     await pr.load(pdfBytes);
 
     setPdfBytes(pdfBytes);

@@ -3,8 +3,9 @@ import { useRef, useEffect } from 'react';
 function HighDpiCanvas({ width, height, render }) {
     const canvasRef = useRef();
 
-    const canvasWidth = width * window.devicePixelRatio;
-    const canvasHeight = height * window.devicePixelRatio;
+    const dpr = window.devicePixelRatio || 1;
+    const canvasWidth = width * dpr;
+    const canvasHeight = height * dpr;
     const canvasStyle = { width: `${width}px`, height: `${height}px` };
 
     useEffect(() => {
