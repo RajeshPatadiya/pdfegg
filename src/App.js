@@ -65,7 +65,7 @@ function PdfViewer({ pdfRenderer }) {
       <button disabled={!hasPrev} onClick={prevPage}>Prev</button>
       <button disabled={!hasNext} onClick={nextPage}>Next</button>
       <br />
-      <PdfPage width="600" render={pdfRenderer.renderPage.bind(pdfRenderer, pageNumber)} />
+      <PdfPage width="600" height="200" renderPage={pdfRenderer.renderPage.bind(pdfRenderer, pageNumber)} />
     </>
   );
 }
