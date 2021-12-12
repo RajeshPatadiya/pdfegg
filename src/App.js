@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import download from 'downloadjs';
 
 import PdfRenderer from './pdf-renderer';
@@ -43,12 +43,23 @@ function App() {
 }
 
 function PdfViewer({ pdfRenderer }) {
+  const [pageDimensions, setPageDimensions] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
+
+  useEffect(() => {
+    async function updateDimensions() {
+      console.log(`update dimensions for ${pageNumber}`);
+      const dimensions = await pdfRenderer.getPageDimensions(pageNumber);
+      setPageDimensions(dimensions);
+    }
+    updateDimensions();
+  }, [pdfRenderer, pageNumber]);
 
   const hasPrev = pageNumber > 1;
   function prevPage() {
     if (hasPrev) {
       setPageNumber(p => p - 1);
+      setPageDimensions(null);
     }
   }
 
@@ -56,8 +67,14 @@ function PdfViewer({ pdfRenderer }) {
   function nextPage() {
     if (hasNext) {
       setPageNumber(p => p + 1);
+      setPageDimensions(null);
     }
   }
+
+  if (pageDimensions === null) return <p>Loading...</p>;
+
+  const { width, height } = pageDimensions;
+  const pageAspectRatio = width / height;
 
   return (
     <>
@@ -65,7 +82,7 @@ function PdfViewer({ pdfRenderer }) {
       <button disabled={!hasPrev} onClick={prevPage}>Prev</button>
       <button disabled={!hasNext} onClick={nextPage}>Next</button>
       <br />
-      <PdfPage width="600" height="200" renderPage={pdfRenderer.renderPage.bind(pdfRenderer, pageNumber)} />
+      <PdfPage width="800" aspectRatio={pageAspectRatio} renderPage={pdfRenderer.renderPage.bind(pdfRenderer, pageNumber)} />
     </>
   );
 }

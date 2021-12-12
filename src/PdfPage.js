@@ -1,12 +1,8 @@
-import HighDpiCanvas from "./HighDpiCanvas";
+import HighDpiCanvas from "./common/HighDpiCanvas";
 
-function PdfPage({ width, height, renderPage }) {
-    const containerStyle = { width: `${width}px`, height: `${height}px` };
-
+function PdfPage({ width, aspectRatio, renderPage }) {
     return (
-        <div className="page-container" style={containerStyle}>
-            <HighDpiCanvas width={width} height={height} render={renderPage} />
-        </div>
+        <HighDpiCanvas width={width} height={width / aspectRatio} render={renderPage} />
     );
 }
 
