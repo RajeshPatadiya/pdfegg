@@ -45,6 +45,7 @@ function App() {
 
 function PdfViewer({ pdfRenderer }) {
   const [x, setX] = useState(0);
+  const [y, setY] = useState(0);
 
   const [pageDimensions, setPageDimensions] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -84,9 +85,9 @@ function PdfViewer({ pdfRenderer }) {
   const renderBox = useCallback(
     (context) => {
       console.log('draw rect');
-      context.fillRect(x, x, 100, 100);
+      context.fillRect(x, y, 100, 100);
     },
-    [x],
+    [x, y],
   );
 
   if (pageDimensions === null) return <p>Loading...</p>;
@@ -102,7 +103,8 @@ function PdfViewer({ pdfRenderer }) {
       <p>{pageNumber} / {pdfRenderer.pageCount}</p>
       <button disabled={!hasPrev} onClick={prevPage}>Prev</button>
       <button disabled={!hasNext} onClick={nextPage}>Next</button>
-      <input value={x} onChange={e => setX(e.target.value)} />
+      <input type="number" value={x} onChange={e => setX(e.target.value)} />
+      <input type="number" value={y} onChange={e => setY(e.target.value)} />
       <br />
       <div className="page-container">
         {/* <PdfPage
