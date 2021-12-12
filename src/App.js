@@ -94,6 +94,9 @@ function PdfViewer({ pdfRenderer }) {
   const { width, height } = pageDimensions;
   const pageAspectRatio = width / height;
 
+  const containerWidth = 800;
+  const containerHeight = containerWidth / pageAspectRatio;
+
   return (
     <>
       <p>{pageNumber} / {pdfRenderer.pageCount}</p>
@@ -109,13 +112,13 @@ function PdfViewer({ pdfRenderer }) {
           renderPage={pdfRenderer.renderPage}
         /> */}
         <HighDpiCanvas
-          width="800"
-          height={800 / pageAspectRatio}
+          width={containerWidth}
+          height={containerHeight}
           render={renderPage}
         />
         <HighDpiCanvas
-          width="800"
-          height={800 / pageAspectRatio}
+          width={containerWidth}
+          height={containerHeight}
           render={renderBox}
         />
       </div>
