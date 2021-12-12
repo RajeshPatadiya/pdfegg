@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import download from 'downloadjs';
 
 import PdfRenderer from './pdf-renderer';
 import PdfPage from './PdfPage';
 import generateModifiedPdf from './generateModifiedPdf';
 import './App.css';
+import HighDpiCanvas from './common/HighDpiCanvas';
 
 function App() {
   const [pdfBytes, setPdfBytes] = useState(null);
@@ -43,6 +44,8 @@ function App() {
 }
 
 function PdfViewer({ pdfRenderer }) {
+  const [x, setX] = useState(0);
+
   const [pageDimensions, setPageDimensions] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
 
@@ -71,6 +74,13 @@ function PdfViewer({ pdfRenderer }) {
     }
   }
 
+  const renderPage = useCallback(
+    (canvasContext) => {
+      pdfRenderer.renderPage(pageNumber, canvasContext);
+    },
+    [pdfRenderer, pageNumber],
+  );
+
   if (pageDimensions === null) return <p>Loading...</p>;
 
   const { width, height } = pageDimensions;
@@ -81,8 +91,30 @@ function PdfViewer({ pdfRenderer }) {
       <p>{pageNumber} / {pdfRenderer.pageCount}</p>
       <button disabled={!hasPrev} onClick={prevPage}>Prev</button>
       <button disabled={!hasNext} onClick={nextPage}>Next</button>
+      <input value={x} onChange={e => setX(e.target.value)} />
       <br />
-      <PdfPage width="800" aspectRatio={pageAspectRatio} renderPage={pdfRenderer.renderPage.bind(pdfRenderer, pageNumber)} />
+      <div className="page-container">
+        {/* <PdfPage
+          width="800"
+          aspectRatio={pageAspectRatio}
+          pageNumber={pageNumber}
+          renderPage={pdfRenderer.renderPage}
+        /> */}
+        <HighDpiCanvas
+          width="800"
+          height={800 / pageAspectRatio}
+          render={renderPage}
+        />
+        <HighDpiCanvas
+          width="800"
+          height={800 / pageAspectRatio}
+          render={(context) => {
+            console.log('draw rect');
+            context.rect(x, 0, 100, 100);
+            context.fill();
+          }}
+        />
+      </div>
     </>
   );
 }

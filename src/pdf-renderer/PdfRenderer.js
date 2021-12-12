@@ -32,6 +32,7 @@ export default class PdfRenderer {
     }
 
     async renderPage(pageNum, canvasContext) {
+        console.log('render page');
         const page = await this.#pdf.getPage(pageNum);
         const viewport = page.getViewport({ scale: 1 });
 

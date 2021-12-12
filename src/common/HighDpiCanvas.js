@@ -9,7 +9,10 @@ function HighDpiCanvas({ width, height, render }) {
     const canvasStyle = { width: `${width}px`, height: `${height}px` };
 
     useEffect(() => {
-        const context = canvasRef.current.getContext('2d');
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        console.log('clear canvas');
         render(context);
     }, [canvasWidth, canvasHeight, render]);
 
