@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import download from 'downloadjs';
 
 import PdfRenderer from './pdf-renderer';
-import PdfPage from './PdfPage';
 import generateModifiedPdf from './generateModifiedPdf';
 import './App.css';
 import HighDpiCanvas from './common/HighDpiCanvas';
@@ -111,12 +110,6 @@ function PdfViewer({ pdfBytes, pdfRenderer }) {
       >Download</button>
       <br />
       <div className="page-container">
-        {/* <PdfPage
-          width="800"
-          aspectRatio={pageAspectRatio}
-          pageNumber={pageNumber}
-          renderPage={pdfRenderer.renderPage}
-        /> */}
         <HighDpiCanvas
           width={containerWidth}
           height={containerHeight}
