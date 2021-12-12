@@ -84,10 +84,13 @@ function PdfViewer({ pdfRenderer }) {
 
   const renderBox = useCallback(
     (context) => {
-      console.log('draw rect');
-      context.fillRect(x, y, 100, 100);
+      const { width } = pageDimensions;
+      const _x = pdfToCanvasUnits(x, width, context.canvas.width);
+      const _y = pdfToCanvasUnits(y, width, context.canvas.width);
+      const size = pdfToCanvasUnits(100, width, context.canvas.width);
+      context.fillRect(_x, _y, size, size);
     },
-    [x, y],
+    [x, y, pageDimensions],
   );
 
   if (pageDimensions === null) return <p>Loading...</p>;
@@ -126,6 +129,14 @@ function PdfViewer({ pdfRenderer }) {
       </div>
     </>
   );
+}
+
+function pdfToCanvasUnits(pdfUnits, pdfWidth, canvasWidth) {
+  return pdfUnits / pdfWidth * canvasWidth;
+}
+
+function canvasToPdfUnits(canvasUnits, pdfWidth, canvasWidth) {
+  return canvasUnits / canvasWidth * pdfWidth;
 }
 
 export default App;
