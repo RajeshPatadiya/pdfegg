@@ -8,13 +8,14 @@ async function generateModifiedPdf(pdfBytes, canvasX, canvasY) {
     const { width, height } = firstPage.getSize();
 
     console.log([width, height]);
+    console.log([canvasX, canvasY]);
 
     firstPage.drawRectangle({
         x: canvasX,
-        y: height - canvasY,
+        y: height - canvasY - 100,
         width: 100,
         height: 100,
-        color: rgb(0.1, 0.95, 0.1),
+        color: rgb(0, 0, 1),
     });
 
     return await pdfDoc.save();

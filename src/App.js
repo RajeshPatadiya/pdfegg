@@ -30,20 +30,13 @@ function App() {
         accept=".pdf"
         onChange={(e) => onFileChange(e.target.files)}
       />
-      <button
-        disabled={pdfBytes === null}
-        onClick={async (e) => {
-          const outputBytes = await generateModifiedPdf(pdfBytes);
-          download(outputBytes, 'example.pdf', 'application/pdf');
-        }}
-      >Download</button>
       <br />
-      {pdfRenderer && <PdfViewer key={pdfRenderer.id} pdfRenderer={pdfRenderer} />}
+      {pdfRenderer && <PdfViewer key={pdfRenderer.id} pdfBytes={pdfBytes} pdfRenderer={pdfRenderer} />}
     </div >
   );
 }
 
-function PdfViewer({ pdfRenderer }) {
+function PdfViewer({ pdfBytes, pdfRenderer }) {
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);
 
@@ -88,6 +81,7 @@ function PdfViewer({ pdfRenderer }) {
       const _x = pdfToCanvasUnits(x, width, context.canvas.width);
       const _y = pdfToCanvasUnits(y, width, context.canvas.width);
       const size = pdfToCanvasUnits(100, width, context.canvas.width);
+      context.fillStyle = 'blue';
       context.fillRect(_x, _y, size, size);
     },
     [x, y, pageDimensions],
@@ -106,8 +100,15 @@ function PdfViewer({ pdfRenderer }) {
       <p>{pageNumber} / {pdfRenderer.pageCount}</p>
       <button disabled={!hasPrev} onClick={prevPage}>Prev</button>
       <button disabled={!hasNext} onClick={nextPage}>Next</button>
-      <input type="number" value={x} onChange={e => setX(e.target.value)} />
-      <input type="number" value={y} onChange={e => setY(e.target.value)} />
+      <input type="number" value={x} onChange={e => setX(Number(e.target.value))} />
+      <input type="number" value={y} onChange={e => setY(Number(e.target.value))} />
+      <button
+        disabled={pdfBytes === null}
+        onClick={async (e) => {
+          const outputBytes = await generateModifiedPdf(pdfBytes, x, y);
+          download(outputBytes, 'example.pdf', 'application/pdf');
+        }}
+      >Download</button>
       <br />
       <div className="page-container">
         {/* <PdfPage
