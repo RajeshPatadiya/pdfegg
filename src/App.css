@@ -1,5 +1,8 @@
 .page-container {
   position: relative;
+  cursor: crosshair;
+  margin: 0 auto;
+  border: 1px solid black;
 }
 
 .page-container canvas {

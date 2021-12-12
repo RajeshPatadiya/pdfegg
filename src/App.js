@@ -93,6 +93,7 @@ function PdfViewer({ pdfBytes, pdfRenderer }) {
 
   const containerWidth = 800;
   const containerHeight = containerWidth / pageAspectRatio;
+  const containerStyle = { width: `${containerWidth}px`, height: `${containerHeight}px` };
 
   return (
     <>
@@ -109,7 +110,7 @@ function PdfViewer({ pdfBytes, pdfRenderer }) {
         }}
       >Download</button>
       <br />
-      <div className="page-container">
+      <div className="page-container" style={containerStyle}>
         <HighDpiCanvas
           width={containerWidth}
           height={containerHeight}
@@ -119,6 +120,14 @@ function PdfViewer({ pdfBytes, pdfRenderer }) {
           width={containerWidth}
           height={containerHeight}
           render={renderBox}
+          onClick={e => {
+            const canvas = e.target;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            setX(canvasToPdfUnits(x, width, containerWidth));
+            setY(canvasToPdfUnits(y, width, containerWidth));
+          }}
         />
       </div>
     </>
