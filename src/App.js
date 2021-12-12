@@ -81,6 +81,14 @@ function PdfViewer({ pdfRenderer }) {
     [pdfRenderer, pageNumber],
   );
 
+  const renderBox = useCallback(
+    (context) => {
+      console.log('draw rect');
+      context.fillRect(x, x, 100, 100);
+    },
+    [x],
+  );
+
   if (pageDimensions === null) return <p>Loading...</p>;
 
   const { width, height } = pageDimensions;
@@ -108,11 +116,7 @@ function PdfViewer({ pdfRenderer }) {
         <HighDpiCanvas
           width="800"
           height={800 / pageAspectRatio}
-          render={(context) => {
-            console.log('draw rect');
-            context.rect(x, 0, 100, 100);
-            context.fill();
-          }}
+          render={renderBox}
         />
       </div>
     </>

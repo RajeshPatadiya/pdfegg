@@ -12,7 +12,6 @@ function HighDpiCanvas({ width, height, render }) {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
-        console.log('clear canvas');
         render(context);
     }, [canvasWidth, canvasHeight, render]);
 
