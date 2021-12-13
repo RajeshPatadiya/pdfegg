@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 
-function HighDpiCanvas({ width, height, render, onClick }) {
+function HighDpiCanvas({ width, height, render, ...props }) {
     const canvasRef = useRef();
 
     const dpr = window.devicePixelRatio || 1;
@@ -21,7 +21,7 @@ function HighDpiCanvas({ width, height, render, onClick }) {
             width={canvasWidth}
             height={canvasHeight}
             style={canvasStyle}
-            onClick={onClick}
+            {...props}
         />
     );
 }

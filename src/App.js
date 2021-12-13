@@ -38,6 +38,10 @@ function App() {
 function PdfViewer({ pdfBytes, pdfRenderer }) {
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);
+  const [boxWidth, setBoxWidth] = useState(0);
+  const [boxHeight, setBoxHeight] = useState(0);
+
+  const [isDragging, setIsDragging] = useState(false);
 
   const [pageDimensions, setPageDimensions] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -79,11 +83,12 @@ function PdfViewer({ pdfBytes, pdfRenderer }) {
       const { width } = pageDimensions;
       const _x = pdfToCanvasUnits(x, width, context.canvas.width);
       const _y = pdfToCanvasUnits(y, width, context.canvas.width);
-      const size = pdfToCanvasUnits(100, width, context.canvas.width);
+      const _width = pdfToCanvasUnits(boxWidth, width, context.canvas.width);
+      const _height = pdfToCanvasUnits(boxHeight, width, context.canvas.width);
       context.fillStyle = 'blue';
-      context.fillRect(_x, _y, size, size);
+      context.fillRect(_x, _y, _width, _height);
     },
-    [x, y, pageDimensions],
+    [x, y, boxWidth, boxHeight, pageDimensions],
   );
 
   if (pageDimensions === null) return <p>Loading...</p>;
@@ -102,6 +107,8 @@ function PdfViewer({ pdfBytes, pdfRenderer }) {
       <button disabled={!hasNext} onClick={nextPage}>Next</button>
       <input type="number" value={x} onChange={e => setX(Number(e.target.value))} />
       <input type="number" value={y} onChange={e => setY(Number(e.target.value))} />
+      <input type="number" value={boxWidth} onChange={e => setBoxWidth(Number(e.target.value))} />
+      <input type="number" value={boxHeight} onChange={e => setBoxHeight(Number(e.target.value))} />
       <button
         disabled={pdfBytes === null}
         onClick={async (e) => {
@@ -120,13 +127,50 @@ function PdfViewer({ pdfBytes, pdfRenderer }) {
           width={containerWidth}
           height={containerHeight}
           render={renderBox}
-          onClick={e => {
+          // onClick={e => {
+          //   const canvas = e.target;
+          //   const rect = canvas.getBoundingClientRect();
+          //   const x = e.clientX - rect.left;
+          //   const y = e.clientY - rect.top;
+          //   setX(canvasToPdfUnits(x, width, containerWidth));
+          //   setY(canvasToPdfUnits(y, width, containerWidth));
+          // }}
+          onMouseDown={e => {
             const canvas = e.target;
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             setX(canvasToPdfUnits(x, width, containerWidth));
             setY(canvasToPdfUnits(y, width, containerWidth));
+            setBoxHeight(0);
+            setBoxWidth(0);
+            setIsDragging(true);
+          }}
+          // onMouseMove={e => console.log(e)}
+          onMouseMove={e => {
+            if (!isDragging) return;
+            const canvas = e.target;
+            const rect = canvas.getBoundingClientRect();
+            const _x = e.clientX - rect.left;
+            const _y = e.clientY - rect.top;
+            const _pdfX = canvasToPdfUnits(_x, width, containerWidth);
+            const _pdfY = canvasToPdfUnits(_y, width, containerWidth);
+            setBoxWidth(_pdfX - x);
+            setBoxHeight(_pdfY - y);
+          }}
+          onMouseUp={e => {
+            const canvas = e.target;
+            const rect = canvas.getBoundingClientRect();
+            const _x = e.clientX - rect.left;
+            const _y = e.clientY - rect.top;
+            const _pdfX = canvasToPdfUnits(_x, width, containerWidth);
+            const _pdfY = canvasToPdfUnits(_y, width, containerWidth);
+            setBoxWidth(_pdfX - x);
+            setBoxHeight(_pdfY - y);
+            setIsDragging(false);
+          }}
+          onMouseLeave={e => {
+            setIsDragging(false);
           }}
         />
       </div>
