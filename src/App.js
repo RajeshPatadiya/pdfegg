@@ -112,7 +112,7 @@ function PdfViewer({ pdfBytes, pdfRenderer }) {
       <button
         disabled={pdfBytes === null}
         onClick={async (e) => {
-          const outputBytes = await generateModifiedPdf(pdfBytes, x, y);
+          const outputBytes = await generateModifiedPdf(pdfBytes, x, y, boxWidth, boxHeight);
           download(outputBytes, 'example.pdf', 'application/pdf');
         }}
       >Download</button>

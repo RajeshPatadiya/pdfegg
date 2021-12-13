@@ -1,6 +1,6 @@
 import { PDFDocument, rgb } from 'pdf-lib';
 
-async function generateModifiedPdf(pdfBytes, canvasX, canvasY) {
+async function generateModifiedPdf(pdfBytes, canvasX, canvasY, boxWidth, boxHeight) {
     const pdfDoc = await PDFDocument.load(pdfBytes);
 
     const pages = pdfDoc.getPages();
@@ -12,9 +12,9 @@ async function generateModifiedPdf(pdfBytes, canvasX, canvasY) {
 
     firstPage.drawRectangle({
         x: canvasX,
-        y: height - canvasY - 100,
-        width: 100,
-        height: 100,
+        y: height - canvasY - boxHeight,
+        width: boxWidth,
+        height: boxHeight,
         color: rgb(0, 0, 1),
     });
 
