@@ -1,7 +1,7 @@
 import { rgb } from 'pdf-lib';
 
 class RectDrawingOperation {
-    constructor(x, y, width, height, color) {
+    constructor(x, y, width, height, color = 'blue') {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -26,8 +26,8 @@ class RectDrawingOperation {
         const { width: canvasWidth } = canvasContext.canvas;
         const scaleToCanvas = (pdfUnits) => pdfUnits / pdfPageWidth * canvasWidth;
 
-        context.fillStyle = this.color;
-        context.fillRect(
+        canvasContext.fillStyle = this.color;
+        canvasContext.fillRect(
             scaleToCanvas(this.x),
             scaleToCanvas(this.y),
             scaleToCanvas(this.width),

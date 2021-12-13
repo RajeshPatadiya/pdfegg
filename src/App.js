@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useReducer } from 'react';
 import download from 'downloadjs';
 
 import PdfRenderer from './pdf-renderer';
 import generateModifiedPdf from './pdf-generator/generateModifiedPdf';
 import './App.css';
 import HighDpiCanvas from './common/HighDpiCanvas';
+import RectDrawingOperation from './pdf-generator/operations/RectDrawingOperation';
 
 function App() {
   const [pdfBytes, setPdfBytes] = useState(null);
@@ -36,12 +37,7 @@ function App() {
 }
 
 function PdfViewer({ pdfBytes, pdfRenderer }) {
-  const [x, setX] = useState(0);
-  const [y, setY] = useState(0);
-  const [boxWidth, setBoxWidth] = useState(0);
-  const [boxHeight, setBoxHeight] = useState(0);
-
-  const [isDragging, setIsDragging] = useState(false);
+  const [boxState, dispatchBoxEvent] = useReducer(reducer, initialState);
 
   const [pageDimensions, setPageDimensions] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -80,15 +76,13 @@ function PdfViewer({ pdfBytes, pdfRenderer }) {
 
   const renderBox = useCallback(
     (context) => {
-      const { width } = pageDimensions;
-      const _x = pdfToCanvasUnits(x, width, context.canvas.width);
-      const _y = pdfToCanvasUnits(y, width, context.canvas.width);
-      const _width = pdfToCanvasUnits(boxWidth, width, context.canvas.width);
-      const _height = pdfToCanvasUnits(boxHeight, width, context.canvas.width);
-      context.fillStyle = 'blue';
-      context.fillRect(_x, _y, _width, _height);
+      const { operation } = boxState;
+      if (operation === null) return;
+
+      const { width: pdfPageWidth } = pageDimensions;
+      operation.applyOnCanvas(context, pdfPageWidth);
     },
-    [x, y, boxWidth, boxHeight, pageDimensions],
+    [boxState, pageDimensions],
   );
 
   if (pageDimensions === null) return <p>Loading...</p>;
@@ -100,19 +94,38 @@ function PdfViewer({ pdfBytes, pdfRenderer }) {
   const containerHeight = containerWidth / pageAspectRatio;
   const containerStyle = { width: `${containerWidth}px`, height: `${containerHeight}px` };
 
+  const getMouseCoords = (e) => {
+    const canvas = e.target;
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    }
+  };
+
+  const getPdfCoords = (e) => {
+    const { x, y } = getMouseCoords(e);
+    return {
+      x: scaleContainerToPdfUnits(x),
+      y: scaleContainerToPdfUnits(y),
+    }
+  }
+
+  const scaleContainerToPdfUnits = (containerUnits) => containerUnits / containerWidth * width;
+
   return (
     <>
       <p>{pageNumber} / {pdfRenderer.pageCount}</p>
       <button disabled={!hasPrev} onClick={prevPage}>Prev</button>
       <button disabled={!hasNext} onClick={nextPage}>Next</button>
-      <input type="number" value={x} onChange={e => setX(Number(e.target.value))} />
+      {/* <input type="number" value={x} onChange={e => setX(Number(e.target.value))} />
       <input type="number" value={y} onChange={e => setY(Number(e.target.value))} />
       <input type="number" value={boxWidth} onChange={e => setBoxWidth(Number(e.target.value))} />
-      <input type="number" value={boxHeight} onChange={e => setBoxHeight(Number(e.target.value))} />
+      <input type="number" value={boxHeight} onChange={e => setBoxHeight(Number(e.target.value))} /> */}
       <button
         disabled={pdfBytes === null}
         onClick={async (e) => {
-          const outputBytes = await generateModifiedPdf(pdfBytes, x, y, boxWidth, boxHeight);
+          const outputBytes = await generateModifiedPdf(pdfBytes, boxState.operation);
           download(outputBytes, 'example.pdf', 'application/pdf');
         }}
       >Download</button>
@@ -127,50 +140,19 @@ function PdfViewer({ pdfBytes, pdfRenderer }) {
           width={containerWidth}
           height={containerHeight}
           render={renderBox}
-          // onClick={e => {
-          //   const canvas = e.target;
-          //   const rect = canvas.getBoundingClientRect();
-          //   const x = e.clientX - rect.left;
-          //   const y = e.clientY - rect.top;
-          //   setX(canvasToPdfUnits(x, width, containerWidth));
-          //   setY(canvasToPdfUnits(y, width, containerWidth));
-          // }}
           onMouseDown={e => {
-            const canvas = e.target;
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            setX(canvasToPdfUnits(x, width, containerWidth));
-            setY(canvasToPdfUnits(y, width, containerWidth));
-            setBoxHeight(0);
-            setBoxWidth(0);
-            setIsDragging(true);
+            const { x, y } = getPdfCoords(e);
+            dispatchBoxEvent({ type: 'DRAG_START', x, y });
           }}
-          // onMouseMove={e => console.log(e)}
           onMouseMove={e => {
-            if (!isDragging) return;
-            const canvas = e.target;
-            const rect = canvas.getBoundingClientRect();
-            const _x = e.clientX - rect.left;
-            const _y = e.clientY - rect.top;
-            const _pdfX = canvasToPdfUnits(_x, width, containerWidth);
-            const _pdfY = canvasToPdfUnits(_y, width, containerWidth);
-            setBoxWidth(_pdfX - x);
-            setBoxHeight(_pdfY - y);
+            const { x, y } = getPdfCoords(e);
+            dispatchBoxEvent({ type: 'DRAG_UPDATE', x, y });
           }}
           onMouseUp={e => {
-            const canvas = e.target;
-            const rect = canvas.getBoundingClientRect();
-            const _x = e.clientX - rect.left;
-            const _y = e.clientY - rect.top;
-            const _pdfX = canvasToPdfUnits(_x, width, containerWidth);
-            const _pdfY = canvasToPdfUnits(_y, width, containerWidth);
-            setBoxWidth(_pdfX - x);
-            setBoxHeight(_pdfY - y);
-            setIsDragging(false);
+            dispatchBoxEvent({ type: 'DRAG_END' });
           }}
           onMouseLeave={e => {
-            setIsDragging(false);
+            dispatchBoxEvent({ type: 'DRAG_END' });
           }}
         />
       </div>
@@ -178,12 +160,34 @@ function PdfViewer({ pdfBytes, pdfRenderer }) {
   );
 }
 
-function pdfToCanvasUnits(pdfUnits, pdfWidth, canvasWidth) {
-  return pdfUnits / pdfWidth * canvasWidth;
-}
+const initialState = { dragging: false, operation: null };
 
-function canvasToPdfUnits(canvasUnits, pdfWidth, canvasWidth) {
-  return canvasUnits / canvasWidth * pdfWidth;
+function reducer(state, action) {
+  const { dragging, operation } = state;
+  const { type, x, y } = action;
+
+  switch (type) {
+    case 'DRAG_START':
+      return {
+        dragging: true,
+        operation: new RectDrawingOperation(x, y, 0, 0)
+      };
+    case 'DRAG_UPDATE':
+      if (!dragging) return state;
+      const width = x - operation.x;
+      const height = y - operation.y;
+      return {
+        dragging,
+        operation: new RectDrawingOperation(operation.x, operation.y, width, height),
+      };
+    case 'DRAG_END':
+      return {
+        dragging: false,
+        operation
+      };
+    default:
+      throw new Error();
+  }
 }
 
 export default App;
