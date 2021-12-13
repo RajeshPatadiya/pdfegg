@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import download from 'downloadjs';
 
 import PdfRenderer from './pdf-renderer';
-import generateModifiedPdf from './generateModifiedPdf';
+import generateModifiedPdf from './pdf-generator/generateModifiedPdf';
 import './App.css';
 import HighDpiCanvas from './common/HighDpiCanvas';
 
