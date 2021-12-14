@@ -23,7 +23,7 @@ class RectDrawingOperation {
     }
 
     applyOnCanvas(canvasContext, pdfPageWidth) {
-        const { width: canvasWidth } = canvasContext.canvas;
+        const canvasWidth = canvasContext.canvas.width;
         const scaleToCanvas = (pdfUnits) => pdfUnits / pdfPageWidth * canvasWidth;
 
         canvasContext.fillStyle = this.color;
