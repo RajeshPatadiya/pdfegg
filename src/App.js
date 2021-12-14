@@ -37,7 +37,7 @@ function App() {
 }
 
 function PdfViewer({ pdfBytes, pdfRenderer }) {
-  const [boxState, dispatchBoxEvent] = useReducer(reducer, initialState);
+  const [boxState, dispatchBoxEvent] = useReducer(boxReducer, initialBoxState);
 
   const [pageDimensions, setPageDimensions] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -160,9 +160,9 @@ function PdfViewer({ pdfBytes, pdfRenderer }) {
   );
 }
 
-const initialState = { dragging: false, operation: null };
+const initialBoxState = { dragging: false, operation: null };
 
-function reducer(state, action) {
+function boxReducer(state, action) {
   const { dragging, operation } = state;
   const { type, x, y } = action;
 
