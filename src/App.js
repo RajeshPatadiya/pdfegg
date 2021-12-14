@@ -78,8 +78,6 @@ function PdfViewer({ pdfRenderer }) {
     [pdfRenderer, pageNumber],
   );
 
-  if (pageDimensions === null) return <p>Loading...</p>;
-
   return (
     <>
       <p>{pageNumber} / {pdfRenderer.pageCount}</p>
@@ -93,11 +91,17 @@ function PdfViewer({ pdfRenderer }) {
         }}
       >Download</button> */}
       <br />
-      <PageContainer
-        width="800"
-        pageDimensions={pageDimensions}
-        renderPage={renderPage}
-      />
+      {
+        pageDimensions === null
+          ? <p>Loading...</p>
+          : (
+            <PageContainer
+              width="800"
+              pageDimensions={pageDimensions}
+              renderPage={renderPage}
+            />
+          )
+      }
     </>
   );
 }
