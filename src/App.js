@@ -6,7 +6,7 @@ import generateModifiedPdf from './pdf-generator/generateModifiedPdf';
 import './App.css';
 import HighDpiCanvas from './common/HighDpiCanvas';
 import RectDrawingOperation from './pdf-generator/operations/RectDrawingOperation';
-import PdfPageOverlayCanvas from './editor/PdfPageOverlayCanvas';
+import PageOverlayCanvas from './editor/PageOverlayCanvas';
 
 function App() {
   const [pdfBytes, setPdfBytes] = useState(null);
@@ -101,10 +101,10 @@ function PdfViewer({ pdfRenderer }) {
           height={containerHeight}
           render={renderPage}
         />
-        <PdfPageOverlayCanvas
+        <PageOverlayCanvas
           width={containerWidth}
           height={containerHeight}
-          pdfPageWidth={width}
+          pageWidth={width}
         />
       </div>
     </>

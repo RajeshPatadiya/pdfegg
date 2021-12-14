@@ -2,16 +2,16 @@ import { useCallback, useReducer } from "react";
 import HighDpiCanvas from "../common/HighDpiCanvas";
 import RectDrawingOperation from "../pdf-generator/operations/RectDrawingOperation";
 
-function PdfPageOverlayCanvas({ width, height, pdfPageWidth }) {
+function PageOverlayCanvas({ width, height, pageWidth }) {
     const [boxState, dispatchBoxEvent] = useReducer(boxStateReducer, initialBoxState);
 
     const renderBox = useCallback(
         (context) => {
             const { operation } = boxState;
             if (operation === null) return;
-            operation.applyOnCanvas(context, pdfPageWidth);
+            operation.applyOnCanvas(context, pageWidth);
         },
-        [boxState, pdfPageWidth],
+        [boxState, pageWidth],
     );
 
     const getMouseCoords = (e) => {
@@ -23,15 +23,15 @@ function PdfPageOverlayCanvas({ width, height, pdfPageWidth }) {
         }
     };
 
-    const getPdfCoords = (e) => {
+    const getPageCoords = (e) => {
         const { x, y } = getMouseCoords(e);
         return {
-            x: scaleContainerToPdfUnits(x),
-            y: scaleContainerToPdfUnits(y),
+            x: scaleContainerToPageUnits(x),
+            y: scaleContainerToPageUnits(y),
         }
     }
 
-    const scaleContainerToPdfUnits = (containerUnits) => containerUnits / width * pdfPageWidth;
+    const scaleContainerToPageUnits = (containerUnits) => containerUnits / width * pageWidth;
 
     return (
         <HighDpiCanvas
@@ -39,11 +39,11 @@ function PdfPageOverlayCanvas({ width, height, pdfPageWidth }) {
             height={height}
             render={renderBox}
             onMouseDown={e => {
-                const { x, y } = getPdfCoords(e);
+                const { x, y } = getPageCoords(e);
                 dispatchBoxEvent({ type: 'DRAG_START', x, y });
             }}
             onMouseMove={e => {
-                const { x, y } = getPdfCoords(e);
+                const { x, y } = getPageCoords(e);
                 dispatchBoxEvent({ type: 'DRAG_UPDATE', x, y });
             }}
             onMouseUp={e => {
@@ -86,4 +86,4 @@ function boxStateReducer(state, action) {
     }
 }
 
-export default PdfPageOverlayCanvas;
+export default PageOverlayCanvas;
