@@ -7,6 +7,7 @@ import './App.css';
 import HighDpiCanvas from './common/HighDpiCanvas';
 import RectDrawingOperation from './pdf-generator/operations/RectDrawingOperation';
 import PageOverlayCanvas from './editor/PageOverlayCanvas';
+import PageContainer from './editor/PageContainer';
 
 function App() {
   const [pdfBytes, setPdfBytes] = useState(null);
@@ -48,6 +49,10 @@ function PdfViewer({ pdfRenderer }) {
       setPageDimensions(dimensions);
     }
     updateDimensions();
+    // await pdfRenderer.loadPage(pageNumber);
+    // setLoaded(true);
+    // pdfRenderer.isPageLoaded(pageNumber);
+    // pdfRenderer.getPageDimensions(pageNumber); // sync
   }, [pdfRenderer, pageNumber]);
 
   const hasPrev = pageNumber > 1;
@@ -75,13 +80,6 @@ function PdfViewer({ pdfRenderer }) {
 
   if (pageDimensions === null) return <p>Loading...</p>;
 
-  const { width, height } = pageDimensions;
-  const pageAspectRatio = width / height;
-
-  const containerWidth = 800;
-  const containerHeight = containerWidth / pageAspectRatio;
-  const containerStyle = { width: `${containerWidth}px`, height: `${containerHeight}px` };
-
   return (
     <>
       <p>{pageNumber} / {pdfRenderer.pageCount}</p>
@@ -95,18 +93,11 @@ function PdfViewer({ pdfRenderer }) {
         }}
       >Download</button> */}
       <br />
-      <div className="page-container" style={containerStyle}>
-        <HighDpiCanvas
-          width={containerWidth}
-          height={containerHeight}
-          render={renderPage}
-        />
-        <PageOverlayCanvas
-          width={containerWidth}
-          height={containerHeight}
-          pageWidth={width}
-        />
-      </div>
+      <PageContainer
+        width="800"
+        pageDimensions={pageDimensions}
+        renderPage={renderPage}
+      />
     </>
   );
 }
