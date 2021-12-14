@@ -2,8 +2,8 @@ import { useCallback, useReducer } from "react";
 import HighDpiCanvas from "../common/HighDpiCanvas";
 import RectDrawingOperation from "../pdf-generator/operations/RectDrawingOperation";
 
-function PdfPageCanvas({ width, height, pdfPageWidth }) {
-    const [boxState, dispatchBoxEvent] = useReducer(boxReducer, initialBoxState);
+function PdfPageOverlayCanvas({ width, height, pdfPageWidth }) {
+    const [boxState, dispatchBoxEvent] = useReducer(boxStateReducer, initialBoxState);
 
     const renderBox = useCallback(
         (context) => {
@@ -58,7 +58,7 @@ function PdfPageCanvas({ width, height, pdfPageWidth }) {
 
 const initialBoxState = { dragging: false, operation: null };
 
-function boxReducer(state, action) {
+function boxStateReducer(state, action) {
     const { dragging, operation } = state;
     const { type, x, y } = action;
 
@@ -86,4 +86,4 @@ function boxReducer(state, action) {
     }
 }
 
-export default PdfPageCanvas;
+export default PdfPageOverlayCanvas;
