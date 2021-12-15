@@ -1,9 +1,17 @@
+import { useCallback } from "react";
 import HighDpiCanvas from "../common/HighDpiCanvas";
 import PageOverlayCanvas from "./PageOverlayCanvas";
 
-function PageContainer({ width, pageDimensions, renderPage }) {
-    const height = width / pageDimensions.width * pageDimensions.height;
+function PageContainer({ width, pageHandle }) {
+    const height = width / pageHandle.width * pageHandle.height;
     const style = { width: `${width}px`, height: `${height}px` };
+
+    const renderPage = useCallback(
+        (canvasContext) => {
+            pageHandle.render(canvasContext);
+        },
+        [pageHandle],
+    );
 
     return (
         <div className="page-container" style={style}>
@@ -15,7 +23,7 @@ function PageContainer({ width, pageDimensions, renderPage }) {
             <PageOverlayCanvas
                 width={width}
                 height={height}
-                pageWidth={pageDimensions.width}
+                pageWidth={pageHandle.width}
             />
         </div>
     );

@@ -1,22 +1,18 @@
 import { useState } from 'react';
 
-import PdfRenderer from './pdf-renderer';
+import PdfHandle from './pdf-rendering';
 import PdfViewer from './editor/PdfViewer';
 import './App.css';
 
 function App() {
-  const [pdfBytes, setPdfBytes] = useState(null);
-  const [pdfRenderer, setPdfRenderer] = useState(null);
+  const [pdfHandle, setPdfHandle] = useState(null);
 
   async function onFileChange(files) {
     if (files.length === 0) return;
 
     const pdfBytes = await files[0].arrayBuffer();
-    const pr = new PdfRenderer();
-    await pr.load(pdfBytes);
-
-    setPdfBytes(pdfBytes);
-    setPdfRenderer(pr);
+    const newPdfHandle = await PdfHandle.create(pdfBytes);
+    setPdfHandle(newPdfHandle);
   }
 
   return (
@@ -35,7 +31,7 @@ function App() {
           }}
         >Download</button> */}
       <br />
-      {pdfRenderer && <PdfViewer key={pdfRenderer.id} pdfRenderer={pdfRenderer} />}
+      {pdfHandle && <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />}
     </div >
   );
 }
