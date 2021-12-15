@@ -1,5 +1,7 @@
 import pdfjs from './pdfjsSetup';
 
+// Stateful object. Responsible for rendering PDF to canvas.
+// A wrapper around pdf.js library.
 export default class PdfRenderer {
     #pdf;
     #id;

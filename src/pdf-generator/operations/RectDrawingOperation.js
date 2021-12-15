@@ -1,5 +1,7 @@
 import { rgb } from 'pdf-lib';
 
+// Immutable object. Represents a single rect draw operation.
+// All measurements are stored in PDF units.
 class RectDrawingOperation {
     constructor(x, y, width, height, color = 'blue') {
         this.x = x;
