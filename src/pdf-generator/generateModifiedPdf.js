@@ -1,10 +1,10 @@
 import { PDFDocument } from 'pdf-lib';
 
-async function generateModifiedPdf(pdfBytes, operation) {
+async function generateModifiedPdf(pdfBytes, operations) {
     const pdfDoc = await PDFDocument.load(pdfBytes);
     const pages = pdfDoc.getPages();
 
-    operation.applyOnPdfPage(pages[0]);
+    operations.forEach(op => op.applyOnPdfPage(pages[0]));
 
     return await pdfDoc.save();
 }
