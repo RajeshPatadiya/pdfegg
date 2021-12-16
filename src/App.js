@@ -27,7 +27,7 @@ function App() {
         onChange={(e) => onFileChange(e.target.files)}
       />
       <OperationsProvider>
-        <DownloadButton pdfBytes={pdfHandle.bytes} />
+        {pdfHandle && <DownloadButton pdfBytes={pdfHandle.bytes} />}
         {/* TODO: Use proper layout */}
         <br />
         {pdfHandle && <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />}
