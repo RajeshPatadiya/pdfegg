@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import PdfHandle from "./pdf-rendering";
+import { PdfHandle } from "./pdf-rendering";
 import PdfViewer from "./editor/PdfViewer";
 import "./App.css";
 import { OperationsProvider, useOperations } from "./editor/OperationsContext";
@@ -8,13 +8,14 @@ import generateModifiedPdf from "./pdf-generator/generateModifiedPdf";
 import download from "downloadjs";
 
 function App() {
-  const [pdfHandle, setPdfHandle] = useState(null);
+  const [pdfHandle, setPdfHandle] = useState<PdfHandle | null>(null);
 
-  async function onFileChange(files) {
-    if (files.length === 0) return;
+  async function onFileChange(files: FileList | null) {
+    if (files === null || files.length === 0) return;
 
-    const pdfBytes = await files[0].arrayBuffer();
-    const newPdfHandle = await PdfHandle.create(pdfBytes);
+    const buffer = await files[0].arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    const newPdfHandle = await PdfHandle.create(bytes);
     setPdfHandle(newPdfHandle);
   }
 

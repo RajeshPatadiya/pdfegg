@@ -2,6 +2,7 @@
 
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf";
 
+// @ts-ignore
 // eslint-disable-next-line
 import pdfjsWorker from "file-loader!pdfjs-dist/legacy/build/pdf.worker";
 

@@ -1,6 +1,6 @@
 import { PDFDocument } from "pdf-lib";
 
-async function generateModifiedPdf(pdfBytes, operations) {
+async function generateModifiedPdf(pdfBytes: Uint8Array, operations) {
   const pdfDoc = await PDFDocument.load(pdfBytes);
   const pages = pdfDoc.getPages();
 
