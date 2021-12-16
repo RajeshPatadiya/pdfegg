@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import PdfHandle from './pdf-rendering';
-import PdfViewer from './editor/PdfViewer';
-import './App.css';
-import { OperationsProvider, useOperations } from './editor/OperationsContext';
-import generateModifiedPdf from './pdf-generator/generateModifiedPdf';
-import download from 'downloadjs';
+import PdfHandle from "./pdf-rendering";
+import PdfViewer from "./editor/PdfViewer";
+import "./App.css";
+import { OperationsProvider, useOperations } from "./editor/OperationsContext";
+import generateModifiedPdf from "./pdf-generator/generateModifiedPdf";
+import download from "downloadjs";
 
 function App() {
   const [pdfHandle, setPdfHandle] = useState(null);
@@ -32,7 +32,7 @@ function App() {
         <br />
         {pdfHandle && <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />}
       </OperationsProvider>
-    </div >
+    </div>
   );
 }
 
@@ -41,14 +41,13 @@ function DownloadButton({ pdfBytes }) {
 
   async function downloadModifiedPdf() {
     const outputBytes = await generateModifiedPdf(pdfBytes, operations);
-    download(outputBytes, 'example.pdf', 'application/pdf');
+    download(outputBytes, "example.pdf", "application/pdf");
   }
 
   return (
-    <button
-      disabled={pdfBytes === null}
-      onClick={() => downloadModifiedPdf()}
-    >Download</button>
+    <button disabled={pdfBytes === null} onClick={() => downloadModifiedPdf()}>
+      Download
+    </button>
   );
 }
 
