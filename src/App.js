@@ -28,6 +28,7 @@ function App() {
       />
       <OperationsProvider>
         <DownloadButton pdfBytes={pdfHandle.bytes} />
+        {/* TODO: Use proper layout */}
         <br />
         {pdfHandle && <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />}
       </OperationsProvider>
