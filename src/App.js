@@ -3,6 +3,7 @@ import { useState } from 'react';
 import PdfHandle from './pdf-rendering';
 import PdfViewer from './editor/PdfViewer';
 import './App.css';
+import { OperationsProvider } from './editor/OperationsContext';
 
 function App() {
   const [pdfHandle, setPdfHandle] = useState(null);
@@ -23,15 +24,17 @@ function App() {
         accept=".pdf"
         onChange={(e) => onFileChange(e.target.files)}
       />
-      {/* <button
+      <OperationsProvider>
+        {/* <button
           disabled={pdfBytes === null}
           onClick={async (e) => {
             const outputBytes = await generateModifiedPdf(pdfBytes, boxState.operation);
             download(outputBytes, 'example.pdf', 'application/pdf');
           }}
         >Download</button> */}
-      <br />
-      {pdfHandle && <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />}
+        <br />
+        {pdfHandle && <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />}
+      </OperationsProvider>
     </div >
   );
 }

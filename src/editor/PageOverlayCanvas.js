@@ -1,17 +1,22 @@
 import { useCallback, useReducer } from "react";
 import HighDpiCanvas from "../common/HighDpiCanvas";
 import RectDrawingOperation from "../pdf-generator/operations/RectDrawingOperation";
+import { useOperations, useOperationsDispatch } from "./OperationsContext";
 
 function PageOverlayCanvas({ width, height, pageWidth }) {
-    const [boxState, dispatchBoxEvent] = useReducer(boxStateReducer, initialBoxState);
+    const [boxState, boxStateDispatch] = useReducer(boxStateReducer, initialBoxState);
+    const operations = useOperations();
+    const operationsDispatch = useOperationsDispatch();
 
     const renderBox = useCallback(
         (context) => {
-            const { operation } = boxState;
-            if (operation === null) return;
-            operation.applyOnCanvas(context, pageWidth);
+            operations.forEach(op => op.applyOnCanvas(context, pageWidth));
+
+            if (boxState.operation !== null) {
+                boxState.operation.applyOnCanvas(context, pageWidth);
+            }
         },
-        [boxState, pageWidth],
+        [boxState, operations, pageWidth],
     );
 
     const getMouseCoords = (e) => {
@@ -33,25 +38,32 @@ function PageOverlayCanvas({ width, height, pageWidth }) {
 
     const scaleContainerToPageUnits = (containerUnits) => containerUnits / width * pageWidth;
 
+    const onDragStart = (e) => {
+        const { x, y } = getPageCoords(e);
+        boxStateDispatch({ type: 'DRAG_START', x, y });
+    };
+
+    const onDragUpdate = (e) => {
+        if (boxState.operation === null) return;
+        const { x, y } = getPageCoords(e);
+        boxStateDispatch({ type: 'DRAG_UPDATE', x, y });
+    };
+
+    const onDragEnd = (e) => {
+        if (boxState.operation === null) return;
+        boxStateDispatch({ type: 'DRAG_END' });
+        operationsDispatch({ type: 'ADD', operation: boxState.operation });
+    };
+
     return (
         <HighDpiCanvas
             width={width}
             height={height}
             render={renderBox}
-            onMouseDown={e => {
-                const { x, y } = getPageCoords(e);
-                dispatchBoxEvent({ type: 'DRAG_START', x, y });
-            }}
-            onMouseMove={e => {
-                const { x, y } = getPageCoords(e);
-                dispatchBoxEvent({ type: 'DRAG_UPDATE', x, y });
-            }}
-            onMouseUp={e => {
-                dispatchBoxEvent({ type: 'DRAG_END' });
-            }}
-            onMouseLeave={e => {
-                dispatchBoxEvent({ type: 'DRAG_END' });
-            }}
+            onMouseDown={onDragStart}
+            onMouseMove={onDragUpdate}
+            onMouseUp={onDragEnd}
+            onMouseLeave={onDragEnd}
         />
     );
 }
@@ -79,10 +91,10 @@ function boxStateReducer(state, action) {
         case 'DRAG_END':
             return {
                 dragging: false,
-                operation
+                operation: null,
             };
         default:
-            throw new Error();
+            throw Error('Unknown action: ' + type);
     }
 }
 
