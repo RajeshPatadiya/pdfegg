@@ -5,7 +5,7 @@ import PdfPageHandle from "./PdfPageHandle";
 class PdfHandle {
   readonly bytes: Uint8Array;
   readonly id: string;
-  private pdfjsDocument;
+  private pdfjsDocument: PDFDocumentProxy;
 
   private constructor(
     pdfBytes: Uint8Array,
