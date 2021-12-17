@@ -1,11 +1,14 @@
-// Reference: https://github.com/wojtekmaj/react-pdf/blob/ca4453f123af51e2faed39a8a62800901030459a/src/entry.webpack.js
+/* eslint-disable import/no-webpack-loader-syntax */
+// Reference: https://github.com/mozilla/pdf.js/issues/12379#issuecomment-692804601
 
-import * as pdfjs from "pdfjs-dist/legacy/build/pdf";
-
+// We need to get the url of the worker (we use min for prod)
 // @ts-ignore
-// eslint-disable-next-line
-import pdfjsWorker from "file-loader!pdfjs-dist/legacy/build/pdf.worker";
+import workerSrc from "!!file-loader!pdfjs-dist/build/pdf.worker.min.js";
 
-pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+// Use require because import doesn't work for some obscure reason. Also use `webpackChunkName` so it will not bundle this huge lib in your main code
+const pdfjs = require(/* webpackChunkName: "pdfjs-dist" */ `pdfjs-dist`);
+
+// Now you assign the worker file path to the `pdfjs` (yes, it's that cumbersome)
+pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 export default pdfjs;
