@@ -37,7 +37,7 @@ function App() {
   );
 }
 
-function DownloadButton({ pdfBytes }) {
+function DownloadButton({ pdfBytes }: { pdfBytes: Uint8Array }) {
   const operations = useOperations();
 
   async function downloadModifiedPdf() {
