@@ -1,7 +1,12 @@
 import React, { createContext, useContext, useReducer } from "react";
+import Operation from "../pdf-generator/operations/Operation";
 
-const OperationsContext = createContext<any[]>(null!);
-const OperationsDispatchContext = createContext<React.Dispatch<any>>(null!);
+type Operations = Operation[];
+type OperationsAction = any;
+type OperationsDispatch = React.Dispatch<OperationsAction>;
+
+const OperationsContext = createContext<Operations>(null!);
+const OperationsDispatchContext = createContext<OperationsDispatch>(null!);
 
 export function OperationsProvider({
   children,
@@ -27,7 +32,10 @@ export function useOperationsDispatch() {
   return useContext(OperationsDispatchContext);
 }
 
-function operationsReducer(operations: any[], action: any) {
+function operationsReducer(
+  operations: Operations,
+  action: OperationsAction
+): Operations {
   switch (action.type) {
     case "ADD": {
       return [...operations, action.operation];

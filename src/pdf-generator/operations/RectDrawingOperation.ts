@@ -1,9 +1,22 @@
-import { rgb } from "pdf-lib";
+import { PDFPage, rgb } from "pdf-lib";
+import Operation from "./Operation";
 
 // Immutable object. Represents a single rect draw operation.
 // All measurements are stored in PDF units.
-class RectDrawingOperation {
-  constructor(x, y, width, height, color = "blue") {
+class RectDrawingOperation implements Operation {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+  readonly color: string;
+
+  constructor(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    color = "blue"
+  ) {
     this.x = x;
     this.y = y;
     this.width = width;
@@ -11,7 +24,7 @@ class RectDrawingOperation {
     this.color = color;
   }
 
-  applyOnPdfPage(pdfPage) {
+  applyOnPdfPage(pdfPage: PDFPage) {
     const { height: pageHeight } = pdfPage.getSize();
 
     pdfPage.drawRectangle({
@@ -24,9 +37,10 @@ class RectDrawingOperation {
     });
   }
 
-  applyOnCanvas(canvasContext, pdfPageWidth) {
+  applyOnCanvas(canvasContext: CanvasRenderingContext2D, pdfPageWidth: number) {
     const canvasWidth = canvasContext.canvas.width;
-    const scaleToCanvas = (pdfUnits) => (pdfUnits / pdfPageWidth) * canvasWidth;
+    const scaleToCanvas = (pdfUnits: number) =>
+      (pdfUnits / pdfPageWidth) * canvasWidth;
 
     canvasContext.fillStyle = this.color;
     canvasContext.fillRect(
