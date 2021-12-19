@@ -1,8 +1,14 @@
 import { useCallback } from "react";
 import HighDpiCanvas from "../common/HighDpiCanvas";
+import { PdfPageHandle } from "../pdf-rendering";
 import PageOverlayCanvas from "./PageOverlayCanvas";
 
-function PageContainer({ width, pageHandle }) {
+interface PageContainerProps {
+  width: number;
+  pageHandle: PdfPageHandle;
+}
+
+function PageContainer({ width, pageHandle }: PageContainerProps) {
   const height = (width / pageHandle.width) * pageHandle.height;
   const style = { width: `${width}px`, height: `${height}px` };
 

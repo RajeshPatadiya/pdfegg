@@ -1,16 +1,20 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, MouseEventHandler } from "react";
 
 interface HighDpiCanvasProps {
   width: number;
   height: number;
   render: (canvasContext: CanvasRenderingContext2D) => void;
+  onMouseDown?: MouseEventHandler<HTMLCanvasElement>;
+  onMouseMove?: MouseEventHandler<HTMLCanvasElement>;
+  onMouseUp?: MouseEventHandler<HTMLCanvasElement>;
+  onMouseLeave?: MouseEventHandler<HTMLCanvasElement>;
 }
 
 function HighDpiCanvas({
   width,
   height,
   render,
-  ...props
+  ...eventHandlers
 }: HighDpiCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -35,7 +39,7 @@ function HighDpiCanvas({
       width={canvasWidth}
       height={canvasHeight}
       style={canvasStyle}
-      {...props}
+      {...eventHandlers}
     />
   );
 }

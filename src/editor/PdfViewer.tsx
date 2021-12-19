@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
+import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import PageContainer from "./PageContainer";
 
-function PdfViewer({ pdfHandle }) {
-  const [pageNumber, setPageNumber] = useState(1);
-  const [loadedPages, setLoadedPages] = useState({});
+interface PdfViewerProps {
+  pdfHandle: PdfHandle;
+}
 
-  console.log(loadedPages);
+type LoadedPagesState = Record<number, PdfPageHandle>;
+
+function PdfViewer({ pdfHandle }: PdfViewerProps) {
+  const [pageNumber, setPageNumber] = useState(1);
+  const [loadedPages, setLoadedPages] = useState<LoadedPagesState>({});
 
   useEffect(() => {
     async function loadPage() {
@@ -49,7 +54,7 @@ function PdfViewer({ pdfHandle }) {
       {pageHandle === undefined ? (
         <p>Loading...</p>
       ) : (
-        <PageContainer width="800" pageHandle={pageHandle} />
+        <PageContainer width={800} pageHandle={pageHandle} />
       )}
     </>
   );

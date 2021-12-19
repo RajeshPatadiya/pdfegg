@@ -3,7 +3,22 @@ import HighDpiCanvas from "../common/HighDpiCanvas";
 import RectDrawingOperation from "../pdf-generator/operations/RectDrawingOperation";
 import { useOperations, useOperationsDispatch } from "./OperationsContext";
 
-function PageOverlayCanvas({ width, height, pageWidth }) {
+interface PageOverlayCanvasProps {
+  width: number;
+  height: number;
+  pageWidth: number;
+}
+
+interface Coordinate {
+  x: number;
+  y: number;
+}
+
+function PageOverlayCanvas({
+  width,
+  height,
+  pageWidth,
+}: PageOverlayCanvasProps) {
   const [boxState, boxStateDispatch] = useReducer(
     boxStateReducer,
     initialBoxState
@@ -22,8 +37,8 @@ function PageOverlayCanvas({ width, height, pageWidth }) {
     [boxState, operations, pageWidth]
   );
 
-  const getMouseCoords = (e) => {
-    const canvas = e.target;
+  const getMouseCoords = (e: React.MouseEvent): Coordinate => {
+    const canvas = e.currentTarget;
     const rect = canvas.getBoundingClientRect();
     return {
       x: e.clientX - rect.left,
@@ -31,7 +46,7 @@ function PageOverlayCanvas({ width, height, pageWidth }) {
     };
   };
 
-  const getPageCoords = (e) => {
+  const getPageCoords = (e: React.MouseEvent): Coordinate => {
     const { x, y } = getMouseCoords(e);
     return {
       x: scaleContainerToPageUnits(x),
@@ -39,21 +54,21 @@ function PageOverlayCanvas({ width, height, pageWidth }) {
     };
   };
 
-  const scaleContainerToPageUnits = (containerUnits) =>
+  const scaleContainerToPageUnits = (containerUnits: number): number =>
     (containerUnits / width) * pageWidth;
 
-  const onDragStart = (e) => {
+  const onDragStart: React.MouseEventHandler = (e) => {
     const { x, y } = getPageCoords(e);
     boxStateDispatch({ type: "DRAG_START", x, y });
   };
 
-  const onDragUpdate = (e) => {
+  const onDragUpdate: React.MouseEventHandler = (e) => {
     if (boxState.operation === null) return;
     const { x, y } = getPageCoords(e);
     boxStateDispatch({ type: "DRAG_UPDATE", x, y });
   };
 
-  const onDragEnd = (e) => {
+  const onDragEnd: React.MouseEventHandler = (e) => {
     if (boxState.operation === null) return;
     boxStateDispatch({ type: "DRAG_END" });
     operationsDispatch({ type: "ADD", operation: boxState.operation });
@@ -72,24 +87,44 @@ function PageOverlayCanvas({ width, height, pageWidth }) {
   );
 }
 
-const initialBoxState = { dragging: false, operation: null };
+interface BoxState {
+  operation: RectDrawingOperation | null;
+}
 
-function boxStateReducer(state, action) {
-  const { dragging, operation } = state;
-  const { type, x, y } = action;
+interface BoxDragStartAction {
+  type: "DRAG_START";
+  x: number;
+  y: number;
+}
 
-  switch (type) {
+interface BoxDragUpdateAction {
+  type: "DRAG_UPDATE";
+  x: number;
+  y: number;
+}
+
+interface BoxDragEndAction {
+  type: "DRAG_END";
+}
+
+type BoxAction = BoxDragStartAction | BoxDragUpdateAction | BoxDragEndAction;
+
+const initialBoxState: BoxState = { operation: null };
+
+function boxStateReducer(state: BoxState, action: BoxAction) {
+  const { operation } = state;
+
+  switch (action.type) {
     case "DRAG_START":
       return {
         dragging: true,
-        operation: new RectDrawingOperation(x, y, 0, 0),
+        operation: new RectDrawingOperation(action.x, action.y, 0, 0),
       };
     case "DRAG_UPDATE":
-      if (!dragging) return state;
-      const width = x - operation.x;
-      const height = y - operation.y;
+      if (operation === null) return state;
+      const width = action.x - operation.x;
+      const height = action.y - operation.y;
       return {
-        dragging,
         operation: new RectDrawingOperation(
           operation.x,
           operation.y,
@@ -98,12 +133,9 @@ function boxStateReducer(state, action) {
         ),
       };
     case "DRAG_END":
-      return {
-        dragging: false,
-        operation: null,
-      };
+      return { operation: null };
     default:
-      throw Error("Unknown action: " + type);
+      return state;
   }
 }
 
