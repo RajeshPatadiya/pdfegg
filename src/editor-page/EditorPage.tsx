@@ -5,6 +5,7 @@ import DownloadButton from "./DownloadButton";
 import PdfViewer from "./PdfViewer";
 
 import "./EditorPage.css";
+import Header from "./Header";
 
 function EditorPage() {
   const [pdfHandle, setPdfHandle] = useState<PdfHandle | null>(null);
@@ -20,16 +21,18 @@ function EditorPage() {
 
   return (
     <>
-      <input
-        type="file"
-        name="pdf-input"
-        accept=".pdf"
-        onChange={(e) => onFileChange(e.target.files)}
-      />
       <OperationsProvider>
-        {pdfHandle && <DownloadButton pdfBytes={pdfHandle.bytes} />}
-        {/* TODO: Use proper layout */}
-        <br />
+        <Header>
+          <h1>pdfegg</h1>
+          <input
+            type="file"
+            name="pdf-input"
+            accept=".pdf"
+            onChange={(e) => onFileChange(e.target.files)}
+          />
+          {pdfHandle && <DownloadButton pdfBytes={pdfHandle.bytes} />}
+        </Header>
+
         {pdfHandle && <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />}
       </OperationsProvider>
     </>

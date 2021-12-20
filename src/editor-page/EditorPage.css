@@ -1,3 +1,15 @@
+body {
+  background-color: #f1f1f1;
+}
+
+.header {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  background-color: #3e3e3e;
+  color: #fff;
+}
+
 .page-container {
   position: relative;
   cursor: crosshair;
