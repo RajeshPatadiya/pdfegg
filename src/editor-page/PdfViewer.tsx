@@ -40,23 +40,27 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
   const pageHandle = loadedPages[pageNumber];
 
   return (
-    <>
-      <p>
-        {pageNumber} / {pdfHandle.pageCount}
-      </p>
-      <button disabled={!hasPrev} onClick={prevPage}>
-        Prev
-      </button>
-      <button disabled={!hasNext} onClick={nextPage}>
-        Next
-      </button>
-      <br />
-      {pageHandle === undefined ? (
-        <p>Loading...</p>
-      ) : (
-        <PageContainer width={800} pageHandle={pageHandle} />
-      )}
-    </>
+    <section className="pdf-viewer">
+      <section className="pdf-viewer__nav">
+        <p>
+          {pageNumber} / {pdfHandle.pageCount}
+        </p>
+        <button disabled={!hasPrev} onClick={prevPage}>
+          Prev
+        </button>
+        <button disabled={!hasNext} onClick={nextPage}>
+          Next
+        </button>
+      </section>
+
+      <section className="pdf-viewer__content">
+        {pageHandle === undefined ? (
+          <p>Loading...</p>
+        ) : (
+          <PageContainer width={800} pageHandle={pageHandle} />
+        )}
+      </section>
+    </section>
   );
 }
 

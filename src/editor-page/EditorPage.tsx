@@ -20,7 +20,7 @@ function EditorPage() {
   }
 
   return (
-    <>
+    <div className="editor-page">
       <OperationsProvider>
         <Header>
           <h1>pdfegg</h1>
@@ -35,7 +35,7 @@ function EditorPage() {
 
         {pdfHandle && <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />}
       </OperationsProvider>
-    </>
+    </div>
   );
 }
 
