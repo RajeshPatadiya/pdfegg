@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer } from "react";
-import Operation from "../pdf-generator/operations/Operation";
+import Operation from "../pdf-generating/operations/Operation";
 
 type Operations = Operation[];
 type OperationsAction = any;

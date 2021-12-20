@@ -1,6 +1,6 @@
 import { useCallback, useReducer } from "react";
 import HighDpiCanvas from "../common/HighDpiCanvas";
-import RectDrawingOperation from "../pdf-generator/operations/RectDrawingOperation";
+import RectDrawingOperation from "../pdf-generating/operations/RectDrawingOperation";
 import { useOperations, useOperationsDispatch } from "./OperationsContext";
 
 interface PageOverlayCanvasProps {

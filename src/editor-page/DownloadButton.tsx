@@ -1,5 +1,5 @@
 import download from "downloadjs";
-import generateModifiedPdf from "../pdf-generator/generateModifiedPdf";
+import generateModifiedPdf from "../pdf-generating/generateModifiedPdf";
 import { useOperations } from "./OperationsContext";
 
 function DownloadButton({ pdfBytes }: { pdfBytes: Uint8Array }) {
