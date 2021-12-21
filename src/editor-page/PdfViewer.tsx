@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import PageContainer from "./PageContainer";
+import PageSelector from "./PageSelector";
 
 interface PdfViewerProps {
   pdfHandle: PdfHandle;
@@ -23,35 +24,15 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
     loadPage();
   }, [pdfHandle, pageNumber]);
 
-  const hasPrev = pageNumber > 1;
-  function prevPage() {
-    if (hasPrev) {
-      setPageNumber((p) => p - 1);
-    }
-  }
-
-  const hasNext = pageNumber < pdfHandle.pageCount;
-  function nextPage() {
-    if (hasNext) {
-      setPageNumber((p) => p + 1);
-    }
-  }
-
   const pageHandle = loadedPages[pageNumber];
 
   return (
     <section className="pdf-viewer">
-      <section className="pdf-viewer__nav">
-        <p>
-          {pageNumber} / {pdfHandle.pageCount}
-        </p>
-        <button disabled={!hasPrev} onClick={prevPage}>
-          Prev
-        </button>
-        <button disabled={!hasNext} onClick={nextPage}>
-          Next
-        </button>
-      </section>
+      <PageSelector
+        selectedPageNumber={pageNumber}
+        totalPageCount={pdfHandle.pageCount}
+        onChanged={(pageNumber) => setPageNumber(pageNumber)}
+      />
 
       <section className="pdf-viewer__content">
         {pageHandle === undefined ? (
