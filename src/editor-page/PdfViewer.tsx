@@ -21,7 +21,10 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
         return { ...loadedPages, [pageNumber]: pdfPageHandle };
       });
     }
-    loadPage();
+
+    if (!loadedPages.hasOwnProperty(pageNumber)) {
+      loadPage();
+    }
   }, [pdfHandle, pageNumber]);
 
   const pageHandle = loadedPages[pageNumber];
