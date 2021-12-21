@@ -1,12 +1,12 @@
 import download from "downloadjs";
 import generateModifiedPdf from "../pdf-generating/generateModifiedPdf";
-import { useOperations } from "./OperationsContext";
+import { useDocumentOperations } from "./DocumentOperationsContext";
 
 function DownloadButton({ pdfBytes }: { pdfBytes: Uint8Array }) {
-  const operations = useOperations();
+  const documentOperations = useDocumentOperations();
 
   async function downloadModifiedPdf() {
-    const outputBytes = await generateModifiedPdf(pdfBytes, operations);
+    const outputBytes = await generateModifiedPdf(pdfBytes, documentOperations);
     download(outputBytes, "example.pdf", "application/pdf");
   }
 

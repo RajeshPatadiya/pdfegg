@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { OperationsProvider } from "./OperationsContext";
 import { PdfHandle } from "../pdf-rendering";
 import DownloadButton from "./DownloadButton";
 import PdfViewer from "./PdfViewer";
 
 import "./EditorPage.css";
 import Header from "./Header";
+import { DocumentOperationsProvider } from "./DocumentOperationsContext";
 
 function EditorPage() {
   const [pdfHandle, setPdfHandle] = useState<PdfHandle | null>(null);
@@ -20,8 +20,8 @@ function EditorPage() {
   }
 
   return (
-    <div className="editor-page">
-      <OperationsProvider>
+    <DocumentOperationsProvider>
+      <div className="editor-page">
         <Header>
           <h1>pdfegg</h1>
           <input
@@ -34,8 +34,8 @@ function EditorPage() {
         </Header>
 
         {pdfHandle && <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />}
-      </OperationsProvider>
-    </div>
+      </div>
+    </DocumentOperationsProvider>
   );
 }
 

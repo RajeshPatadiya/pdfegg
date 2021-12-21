@@ -1,14 +1,20 @@
 import { PDFDocument } from "pdf-lib";
-import Operation from "./operations/Operation";
+import { DocumentOperations } from "../editor-page/DocumentOperationsContext";
 
 async function generateModifiedPdf(
   pdfBytes: Uint8Array,
-  operations: Operation[]
+  documentOperations: DocumentOperations
 ) {
   const pdfDoc = await PDFDocument.load(pdfBytes);
   const pages = pdfDoc.getPages();
 
-  operations.forEach((op) => op.applyOnPdfPage(pages[0]));
+  console.log(documentOperations);
+
+  for (const [key, operations] of Object.entries(documentOperations)) {
+    const pageNum = Number(key);
+    const page = pages[pageNum - 1];
+    operations.forEach((op) => op.applyOnPdfPage(page));
+  }
 
   return await pdfDoc.save();
 }

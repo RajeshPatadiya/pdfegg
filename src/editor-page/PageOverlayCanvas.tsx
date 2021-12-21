@@ -1,7 +1,10 @@
 import { useCallback, useReducer } from "react";
 import HighDpiCanvas from "../common/HighDpiCanvas";
 import RectDrawingOperation from "../pdf-generating/operations/RectDrawingOperation";
-import { useOperations, useOperationsDispatch } from "./OperationsContext";
+import {
+  usePageOperations,
+  usePageOperationsDispatch,
+} from "./PageOperationsContext";
 
 interface PageOverlayCanvasProps {
   width: number;
@@ -23,8 +26,8 @@ function PageOverlayCanvas({
     boxStateReducer,
     initialBoxState
   );
-  const operations = useOperations();
-  const operationsDispatch = useOperationsDispatch();
+  const operations = usePageOperations();
+  const operationsDispatch = usePageOperationsDispatch();
 
   const renderBox = useCallback(
     (context) => {
