@@ -38,11 +38,16 @@ export function PageOperationsProvider({
 }
 
 type PageOperationsDispatch = (action: PageOperationsAction) => void;
-type PageOperationsAction = AddPageOperation;
+type PageOperationsAction = AddOperation | RemoveOperation;
 
-interface AddPageOperation {
+interface AddOperation {
   type: "ADD";
   operation: Operation;
+}
+
+interface RemoveOperation {
+  type: "REMOVE";
+  index: number;
 }
 
 function reducer(
@@ -52,6 +57,9 @@ function reducer(
   switch (action.type) {
     case "ADD": {
       return [...operations, action.operation];
+    }
+    case "REMOVE": {
+      return operations.filter((_, index) => index != action.index);
     }
     default: {
       return operations;
