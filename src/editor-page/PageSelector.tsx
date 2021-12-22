@@ -12,7 +12,7 @@ function PageSelector(p: PageSelectorProps) {
   const nextPage = () => p.onChanged(p.selectedPageNumber + 1);
 
   return (
-    <nav className="pdf-viewer__nav">
+    <>
       <p>
         {p.selectedPageNumber} / {p.totalPageCount}
       </p>
@@ -22,7 +22,7 @@ function PageSelector(p: PageSelectorProps) {
       <button disabled={!hasNext} onClick={nextPage}>
         Next
       </button>
-    </nav>
+    </>
   );
 }
 

@@ -3,7 +3,7 @@ import Operation from "./Operation";
 
 // Immutable object. Represents a single rect draw operation.
 // All measurements are stored in PDF units.
-class RectDrawingOperation implements Operation {
+class RectDrawingOperation extends Operation {
   readonly x: number;
   readonly y: number;
   readonly width: number;
@@ -17,10 +17,12 @@ class RectDrawingOperation implements Operation {
     height: number,
     color = "blue"
   ) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
+    // TODO: Pass epoch when loading from BE
+    super(Date.now());
+    this.x = Math.round(x);
+    this.y = Math.round(y);
+    this.width = Math.round(width);
+    this.height = Math.round(height);
     this.color = color;
   }
 
@@ -49,6 +51,10 @@ class RectDrawingOperation implements Operation {
       scaleToCanvas(this.width),
       scaleToCanvas(this.height)
     );
+  }
+
+  getDisplayString() {
+    return `Rect(${this.x}, ${this.y}, ${this.width}, ${this.height}, ${this.color})`;
   }
 }
 

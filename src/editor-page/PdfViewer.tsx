@@ -4,6 +4,7 @@ import {
   useDocumentOperations,
   useDocumentOperationsDispatch,
 } from "./DocumentOperationsContext";
+import OperationsList from "./OperationsList";
 import PageContainer from "./PageContainer";
 import { PageOperationsProvider } from "./PageOperationsContext";
 import PageSelector from "./PageSelector";
@@ -40,11 +41,13 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
   return (
     <section className="pdf-viewer">
-      <PageSelector
-        selectedPageNumber={pageNumber}
-        totalPageCount={pdfHandle.pageCount}
-        onChanged={(pageNumber) => setPageNumber(pageNumber)}
-      />
+      <section className="pdf-viewer__left-sidebar">
+        <PageSelector
+          selectedPageNumber={pageNumber}
+          totalPageCount={pdfHandle.pageCount}
+          onChanged={(pageNumber) => setPageNumber(pageNumber)}
+        />
+      </section>
 
       <PageOperationsProvider
         pageOperations={pageOperations}
@@ -62,6 +65,10 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
           ) : (
             <PageContainer width={800} pageHandle={pageHandle} />
           )}
+        </section>
+
+        <section className="pdf-viewer__right-sidebar">
+          <OperationsList />
         </section>
       </PageOperationsProvider>
     </section>

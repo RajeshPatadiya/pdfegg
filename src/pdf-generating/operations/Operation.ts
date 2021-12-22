@@ -1,11 +1,20 @@
 import { PDFPage } from "pdf-lib";
 
-interface Operation {
-  applyOnPdfPage: (pdfPage: PDFPage) => void;
-  applyOnCanvas: (
+abstract class Operation {
+  creationEpoch: number;
+
+  constructor(creationEpoch: number) {
+    this.creationEpoch = creationEpoch;
+  }
+
+  abstract applyOnPdfPage(pdfPage: PDFPage): void;
+
+  abstract applyOnCanvas(
     canvasContext: CanvasRenderingContext2D,
     pdfPageWidth: number
-  ) => void;
+  ): void;
+
+  abstract getDisplayString(): string;
 }
 
 export default Operation;

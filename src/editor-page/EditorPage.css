@@ -14,11 +14,12 @@
 
 .pdf-viewer {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr 300px;
   overflow: hidden;
 }
 
-.pdf-viewer__nav {
+.pdf-viewer__left-sidebar,
+.pdf-viewer__right-sidebar {
   overflow-y: scroll;
   background-color: #fff;
 }
