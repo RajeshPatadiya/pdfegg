@@ -1,5 +1,6 @@
-import { PDFPage, rgb } from "pdf-lib";
+import { PDFPage } from "pdf-lib";
 import Operation from "./Operation";
+import { hexToPdfColor } from "./utils";
 
 // Immutable object. Represents a single rect draw operation.
 // All measurements are stored in PDF units.
@@ -34,8 +35,7 @@ class RectDrawingOperation extends Operation {
       y: pageHeight - this.y - this.height,
       width: this.width,
       height: this.height,
-      // TODO: Convert color
-      color: rgb(0, 0, 1),
+      color: hexToPdfColor(this.color),
     });
   }
 
