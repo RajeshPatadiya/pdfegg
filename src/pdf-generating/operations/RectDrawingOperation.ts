@@ -15,10 +15,10 @@ class RectDrawingOperation extends Operation {
     y: number,
     width: number,
     height: number,
-    color = "blue"
+    color = "#ff0000",
+    epoch = Date.now()
   ) {
-    // TODO: Pass epoch when loading from BE
-    super(Date.now());
+    super(epoch);
     this.x = Math.round(x);
     this.y = Math.round(y);
     this.width = Math.round(width);
@@ -55,6 +55,17 @@ class RectDrawingOperation extends Operation {
 
   getDisplayString() {
     return `Rect(${this.x}, ${this.y}, ${this.width}, ${this.height}, ${this.color})`;
+  }
+
+  copyWith({ color }: { color: string }): RectDrawingOperation {
+    return new RectDrawingOperation(
+      this.x,
+      this.y,
+      this.width,
+      this.height,
+      color || this.color,
+      this.creationEpoch
+    );
   }
 }
 

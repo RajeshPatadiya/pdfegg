@@ -38,7 +38,7 @@ export function PageOperationsProvider({
 }
 
 type PageOperationsDispatch = (action: PageOperationsAction) => void;
-type PageOperationsAction = AddOperation | RemoveOperation;
+type PageOperationsAction = AddOperation | RemoveOperation | ReplaceOperation;
 
 interface AddOperation {
   type: "ADD";
@@ -48,6 +48,12 @@ interface AddOperation {
 interface RemoveOperation {
   type: "REMOVE";
   index: number;
+}
+
+interface ReplaceOperation {
+  type: "REPLACE";
+  index: number;
+  operation: Operation;
 }
 
 function reducer(
@@ -60,6 +66,11 @@ function reducer(
     }
     case "REMOVE": {
       return operations.filter((_, index) => index != action.index);
+    }
+    case "REPLACE": {
+      return operations.map((op, index) =>
+        index == action.index ? action.operation : op
+      );
     }
     default: {
       return operations;

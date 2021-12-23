@@ -15,6 +15,8 @@ abstract class Operation {
   ): void;
 
   abstract getDisplayString(): string;
+
+  abstract copyWith({}): Operation;
 }
 
 export default Operation;

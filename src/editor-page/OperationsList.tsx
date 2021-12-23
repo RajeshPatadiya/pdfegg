@@ -1,3 +1,4 @@
+import RectDrawingOperation from "../pdf-generating/operations/RectDrawingOperation";
 import {
   usePageOperations,
   usePageOperationsDispatch,
@@ -14,11 +15,30 @@ function OperationsList() {
     });
   };
 
+  const changeColorAt = (index: number, newColor: string) => {
+    const operation = operations[index];
+
+    if (operation instanceof RectDrawingOperation) {
+      dispatch({
+        type: "REPLACE",
+        index,
+        operation: operation.copyWith({ color: newColor }),
+      });
+    }
+  };
+
   return (
     <ul>
       {operations.map((op, index) => (
         <li key={op.creationEpoch}>
           {op.getDisplayString()}
+          {op instanceof RectDrawingOperation && (
+            <input
+              type="color"
+              value={op.color}
+              onChange={(e) => changeColorAt(index, e.target.value)}
+            />
+          )}
           <button onClick={() => deleteAt(index)}>Delete</button>
         </li>
       ))}
