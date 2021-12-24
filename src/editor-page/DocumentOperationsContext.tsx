@@ -32,7 +32,7 @@ export function DocumentOperationsProvider({
   );
 }
 
-export type DocumentOperations = {
+type DocumentOperations = {
   [pageNumber: number]: Operation[];
 };
 type DocumentOperationsDispatch = React.Dispatch<DocumentOperationsAction>;
