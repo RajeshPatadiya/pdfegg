@@ -16,8 +16,18 @@ interface PdfViewerProps {
 type LoadedPagesState = Record<number, PdfPageHandle>;
 
 function PdfViewer({ pdfHandle }: PdfViewerProps) {
-  const [pageNumber, setPageNumber] = useState(1);
   const [loadedPages, setLoadedPages] = useState<LoadedPagesState>({});
+
+  const documentOperations = useDocumentOperations();
+  const documentOperationsDispatch = useDocumentOperationsDispatch();
+
+  const pageNumber = documentOperations.selectedPageNumber;
+  const setPageNumber = (newPageNumber: number) => {
+    documentOperationsDispatch({
+      type: "CHANGE_SELECTED_PAGE",
+      newSelectedPageNumber: newPageNumber,
+    });
+  };
 
   useEffect(() => {
     async function loadPage() {
@@ -35,9 +45,6 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
   const pageHandle = loadedPages[pageNumber];
 
-  const documentOperations = useDocumentOperations();
-  const documentOperationsDispatch = useDocumentOperationsDispatch();
-
   return (
     <section className="pdf-viewer">
       <section className="pdf-viewer__left-sidebar">
@@ -49,7 +56,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
       </section>
 
       <PageOperationsProvider
-        pageOperations={documentOperations[pageNumber]}
+        pageOperations={documentOperations.operationsPerPage[pageNumber]}
         dispatchPageOperationsUpdate={(updatedOperations) => {
           documentOperationsDispatch({
             type: "UPDATE_PAGE_OPERATIONS",

@@ -6,7 +6,10 @@ function DownloadButton({ pdfBytes }: { pdfBytes: Uint8Array }) {
   const documentOperations = useDocumentOperations();
 
   async function downloadModifiedPdf() {
-    const outputBytes = await generateModifiedPdf(pdfBytes, documentOperations);
+    const outputBytes = await generateModifiedPdf(
+      pdfBytes,
+      documentOperations.operationsPerPage
+    );
     download(outputBytes, "example.pdf", "application/pdf");
   }
 
