@@ -37,7 +37,6 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
   const documentOperations = useDocumentOperations();
   const documentOperationsDispatch = useDocumentOperationsDispatch();
-  const pageOperations = documentOperations[pageNumber] || [];
 
   return (
     <section className="pdf-viewer">
@@ -50,7 +49,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
       </section>
 
       <PageOperationsProvider
-        pageOperations={pageOperations}
+        pageOperations={documentOperations[pageNumber]}
         dispatchPageOperationsUpdate={(updatedOperations) => {
           documentOperationsDispatch({
             type: "UPDATE_PAGE_OPERATIONS",

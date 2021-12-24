@@ -1,6 +1,8 @@
 import React, { createContext, useContext } from "react";
 import Operation from "../pdf-generating/operations/Operation";
 
+const initialState: Operation[] = [];
+
 const PageOperationsContext = createContext<Operation[]>(null!);
 const PageOperationsDispatchContext = createContext<PageOperationsDispatch>(
   null!
@@ -23,6 +25,8 @@ export function PageOperationsProvider({
   dispatchPageOperationsUpdate: (updatedOperations: Operation[]) => void;
   children: React.ReactNode;
 }) {
+  pageOperations = pageOperations || initialState;
+
   const dispatch: PageOperationsDispatch = (action) => {
     const updatedOperations = reducer(pageOperations, action);
     dispatchPageOperationsUpdate(updatedOperations);
