@@ -15,23 +15,23 @@ export function usePageOperationsDispatch() {
 }
 
 export function PageOperationsProvider({
-  pageOperations,
-  dispatchPageOperationsUpdate,
+  state,
+  dispatchState,
   children,
 }: {
-  pageOperations: PageOperationsState;
-  dispatchPageOperationsUpdate: (updatedOperations: Operation[]) => void;
+  state: PageOperationsState;
+  dispatchState: (newState: PageOperationsState) => void;
   children: React.ReactNode;
 }) {
-  pageOperations = pageOperations || initialState;
+  state = state || initialState;
 
   const dispatch: PageOperationsDispatch = (action) => {
-    const updatedOperations = reducer(pageOperations, action);
-    dispatchPageOperationsUpdate(updatedOperations);
+    const updatedOperations = reducer(state, action);
+    dispatchState(updatedOperations);
   };
 
   return (
-    <PageOperationsContext.Provider value={pageOperations}>
+    <PageOperationsContext.Provider value={state}>
       <PageOperationsDispatchContext.Provider value={dispatch}>
         {children}
       </PageOperationsDispatchContext.Provider>

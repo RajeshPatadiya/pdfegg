@@ -56,12 +56,12 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
       </section>
 
       <PageOperationsProvider
-        pageOperations={documentOperations.operationsPerPage[pageNumber]}
-        dispatchPageOperationsUpdate={(updatedOperations) => {
+        state={documentOperations.operationsPerPage[pageNumber]}
+        dispatchState={(newState) => {
           documentOperationsDispatch({
             type: "UPDATE_PAGE_OPERATIONS",
             pageNumber: pageNumber,
-            updatedOperations: updatedOperations,
+            updatedOperations: newState,
           });
         }}
       >
