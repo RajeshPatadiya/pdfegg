@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer } from "react";
+import React, { createContext, useContext } from "react";
 import Operation from "../pdf-generating/operations/Operation";
 
 const DocumentOperationsContext = createContext<DocumentOperationsState>(null!);
@@ -14,14 +14,23 @@ export function useDocumentOperationsDispatch() {
 }
 
 export function DocumentOperationsProvider({
+  state,
+  dispatchState,
   children,
 }: {
+  state: DocumentOperationsState;
+  dispatchState: (newState: DocumentOperationsState) => void;
   children: React.ReactNode;
 }) {
-  const [documentOperations, dispatch] = useReducer(reducer, initialState);
+  state = state || initialState;
+
+  const dispatch: DocumentOperationsDispatch = (action) => {
+    const newState = reducer(state, action);
+    dispatchState(newState);
+  };
 
   return (
-    <DocumentOperationsContext.Provider value={documentOperations}>
+    <DocumentOperationsContext.Provider value={state}>
       <DocumentOperationsDispatchContext.Provider value={dispatch}>
         {children}
       </DocumentOperationsDispatchContext.Provider>
