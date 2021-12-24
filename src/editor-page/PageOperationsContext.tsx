@@ -1,9 +1,7 @@
 import React, { createContext, useContext } from "react";
 import Operation from "../pdf-generating/operations/Operation";
 
-const initialState: Operation[] = [];
-
-const PageOperationsContext = createContext<Operation[]>(null!);
+const PageOperationsContext = createContext<PageOperationsState>(null!);
 const PageOperationsDispatchContext = createContext<PageOperationsDispatch>(
   null!
 );
@@ -21,7 +19,7 @@ export function PageOperationsProvider({
   dispatchPageOperationsUpdate,
   children,
 }: {
-  pageOperations: Operation[];
+  pageOperations: PageOperationsState;
   dispatchPageOperationsUpdate: (updatedOperations: Operation[]) => void;
   children: React.ReactNode;
 }) {
@@ -41,6 +39,7 @@ export function PageOperationsProvider({
   );
 }
 
+type PageOperationsState = Operation[];
 type PageOperationsDispatch = (action: PageOperationsAction) => void;
 type PageOperationsAction = AddOperation | RemoveOperation | ReplaceOperation;
 
@@ -60,10 +59,12 @@ interface ReplaceOperation {
   operation: Operation;
 }
 
+const initialState: PageOperationsState = [];
+
 function reducer(
-  operations: Operation[],
+  operations: PageOperationsState,
   action: PageOperationsAction
-): Operation[] {
+): PageOperationsState {
   switch (action.type) {
     case "ADD": {
       return [...operations, action.operation];
