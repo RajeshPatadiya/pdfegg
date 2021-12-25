@@ -60,7 +60,7 @@ interface Redo {
 
 const initialState: StateHistory = {
   currentStateIndex: 0,
-  history: [],
+  history: [null],
 };
 
 function reducer(
