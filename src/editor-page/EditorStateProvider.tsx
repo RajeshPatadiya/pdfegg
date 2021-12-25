@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import { DocumentOperationsProvider } from "./DocumentOperationsContext";
 
 const maxHistoryStackSize = 100;
@@ -28,14 +28,43 @@ function EditorStateProvider({ children }: { children: React.ReactNode }) {
       type: "REDO",
     });
 
+  const ctrlZListener = (e: KeyboardEvent) => {
+    const ctrl = e.ctrlKey || e.metaKey;
+    const alt = e.altKey;
+    const shift = e.shiftKey;
+    const z = e.key === "z";
+
+    if (ctrl && !alt && !shift && z) {
+      undo();
+    }
+  };
+
+  const ctrlShiftZListener = (e: KeyboardEvent) => {
+    const ctrl = e.ctrlKey || e.metaKey;
+    const alt = e.altKey;
+    const shift = e.shiftKey;
+    const z = e.key === "z";
+
+    if (ctrl && !alt && shift && z) {
+      redo();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", ctrlZListener);
+    document.addEventListener("keydown", ctrlShiftZListener);
+
+    return () => {
+      document.removeEventListener("keydown", ctrlZListener);
+      document.removeEventListener("keydown", ctrlShiftZListener);
+    };
+  });
+
   return (
     <DocumentOperationsProvider
       state={currentState}
       dispatchState={pushNewState}
     >
-      {history.length}
-      <button onClick={undo}>Undo</button>
-      <button onClick={redo}>Redo</button>
       {children}
     </DocumentOperationsProvider>
   );
