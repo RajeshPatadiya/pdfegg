@@ -1,6 +1,8 @@
 import { useReducer } from "react";
 import { DocumentOperationsProvider } from "./DocumentOperationsContext";
 
+const maxHistoryStackSize = 100;
+
 function EditorStateProvider({ children }: { children: React.ReactNode }) {
   const [stateHistory, stateHistoryDispatch] = useReducer(
     reducer,
@@ -69,9 +71,10 @@ function reducer(
 ): StateHistory {
   switch (action.type) {
     case "PUSH_NEW_STATE": {
-      // TODO: Limit history stack size
       const i = state.currentStateIndex;
-      const history = [...state.history.slice(0, i + 1), action.newState];
+      const history = [...state.history.slice(0, i + 1), action.newState].slice(
+        -maxHistoryStackSize
+      );
       return {
         currentStateIndex: history.length - 1,
         history,
