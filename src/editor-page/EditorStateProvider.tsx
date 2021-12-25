@@ -69,9 +69,9 @@ function reducer(
 ): StateHistory {
   switch (action.type) {
     case "PUSH_NEW_STATE": {
-      // TODO: Handle pushing after undos
       // TODO: Limit history stack size
-      const history = [...state.history, action.newState];
+      const i = state.currentStateIndex;
+      const history = [...state.history.slice(0, i + 1), action.newState];
       return {
         currentStateIndex: history.length - 1,
         history,
