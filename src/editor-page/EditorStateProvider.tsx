@@ -84,6 +84,7 @@ function reducer(
     case "UNDO": {
       const i = state.currentStateIndex;
       if (i === 0) return state;
+      console.log("undo");
       return {
         ...state,
         currentStateIndex: i - 1,
@@ -93,6 +94,7 @@ function reducer(
       const i = state.currentStateIndex;
       const length = state.history.length;
       if (i === length - 1) return state;
+      console.log("redo");
       return {
         ...state,
         currentStateIndex: i + 1,

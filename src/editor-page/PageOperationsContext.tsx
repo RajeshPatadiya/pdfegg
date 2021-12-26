@@ -30,8 +30,8 @@ export function PageOperationsProvider({
     const newState = reducer(state, action);
 
     if (finished) {
+      dispatchState(newState); // Must be called first
       setLocal(null);
-      dispatchState(newState);
     } else {
       setLocal(newState);
     }

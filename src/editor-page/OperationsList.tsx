@@ -1,4 +1,5 @@
 import RectDrawingOperation from "../pdf-generating/operations/RectDrawingOperation";
+import ColorPicker from "./ColorPicker";
 import {
   usePageOperations,
   usePageOperationsDispatch,
@@ -36,11 +37,10 @@ function OperationsList() {
         <li key={op.creationEpoch}>
           {op.getDisplayString()}
           {op instanceof RectDrawingOperation && (
-            <input
-              type="color"
-              value={op.color}
-              onChange={(e) => changeColorAt(index, e.target.value)}
-              onBlur={(e) => changeColorAt(index, e.target.value, true)}
+            <ColorPicker
+              color={op.color}
+              onChange={(newColor) => changeColorAt(index, newColor)}
+              onChangeEnd={() => changeColorAt(index, op.color, true)}
             />
           )}
           <button onClick={() => deleteAt(index)}>Delete</button>
