@@ -15,15 +15,18 @@ function OperationsList() {
     });
   };
 
-  const changeColorAt = (index: number, newColor: string) => {
+  const changeColorAt = (index: number, newColor: string, finished = false) => {
     const operation = operations[index];
 
     if (operation instanceof RectDrawingOperation) {
-      dispatch({
-        type: "REPLACE",
-        index,
-        operation: operation.copyWith({ color: newColor }),
-      });
+      dispatch(
+        {
+          type: "REPLACE",
+          index,
+          operation: operation.copyWith({ color: newColor }),
+        },
+        finished
+      );
     }
   };
 
@@ -37,6 +40,7 @@ function OperationsList() {
               type="color"
               value={op.color}
               onChange={(e) => changeColorAt(index, e.target.value)}
+              onBlur={(e) => changeColorAt(index, e.target.value, true)}
             />
           )}
           <button onClick={() => deleteAt(index)}>Delete</button>

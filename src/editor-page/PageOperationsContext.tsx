@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useState } from "react";
 import Operation from "../pdf-generating/operations/Operation";
 
 const PageOperationsContext = createContext<PageOperationsState>(null!);
@@ -23,11 +23,18 @@ export function PageOperationsProvider({
   dispatchState: (newState: PageOperationsState) => void;
   children: React.ReactNode;
 }) {
-  state = state || initialState;
+  const [local, setLocal] = useState<PageOperationsState | null>();
+  state = local || state || initialState;
 
-  const dispatch: PageOperationsDispatch = (action) => {
-    const updatedOperations = reducer(state, action);
-    dispatchState(updatedOperations);
+  const dispatch: PageOperationsDispatch = (action, finished = true) => {
+    const newState = reducer(state, action);
+
+    if (finished) {
+      setLocal(null);
+      dispatchState(newState);
+    } else {
+      setLocal(newState);
+    }
   };
 
   return (
@@ -40,7 +47,10 @@ export function PageOperationsProvider({
 }
 
 type PageOperationsState = Operation[];
-type PageOperationsDispatch = (action: PageOperationsAction) => void;
+type PageOperationsDispatch = (
+  action: PageOperationsAction,
+  finished?: boolean
+) => void;
 type PageOperationsAction = AddOperation | RemoveOperation | ReplaceOperation;
 
 interface AddOperation {
