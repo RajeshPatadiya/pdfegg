@@ -19,7 +19,7 @@ function sameCombination(a: KeyCombination, b: KeyCombination): boolean {
 function useKeyDownEffect(
   triggerCombination: KeyCombination,
   callback: () => void
-) {
+): void {
   const keyListener = (e: KeyboardEvent) => {
     const currentCombination: KeyCombination = {
       ctrl: e.ctrlKey || e.metaKey,

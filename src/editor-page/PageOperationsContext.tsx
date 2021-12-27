@@ -26,14 +26,14 @@ export function PageOperationsProvider({
   const [local, setLocal] = useState<PageOperationsState | null>();
   state = local || state || initialState;
 
-  const dispatch: PageOperationsDispatch = (action, finished = true) => {
+  const dispatch: PageOperationsDispatch = (action) => {
     const newState = reducer(state, action);
 
-    if (finished) {
+    if (action.type === "UPDATE" && action.local) {
+      setLocal(newState);
+    } else {
       dispatchState(newState); // Must be called first
       setLocal(null);
-    } else {
-      setLocal(newState);
     }
   };
 
@@ -51,7 +51,7 @@ type PageOperationsDispatch = (
   action: PageOperationsAction,
   finished?: boolean
 ) => void;
-type PageOperationsAction = AddOperation | RemoveOperation | ReplaceOperation;
+type PageOperationsAction = AddOperation | RemoveOperation | UpdateOperation;
 
 interface AddOperation {
   type: "ADD";
@@ -63,10 +63,11 @@ interface RemoveOperation {
   index: number;
 }
 
-interface ReplaceOperation {
-  type: "REPLACE";
+interface UpdateOperation {
+  type: "UPDATE";
   index: number;
   operation: Operation;
+  local: boolean;
 }
 
 const initialState: PageOperationsState = [];
@@ -82,7 +83,7 @@ function reducer(
     case "REMOVE": {
       return operations.filter((_, index) => index != action.index);
     }
-    case "REPLACE": {
+    case "UPDATE": {
       return operations.map((op, index) =>
         index == action.index ? action.operation : op
       );

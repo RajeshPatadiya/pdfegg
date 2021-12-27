@@ -16,18 +16,17 @@ function OperationsList() {
     });
   };
 
-  const changeColorAt = (index: number, newColor: string, finished = false) => {
+  const changeColorAt = (index: number, newColor: string, local: boolean) => {
     const operation = operations[index];
+    console.log("local: " + local);
 
     if (operation instanceof RectDrawingOperation) {
-      dispatch(
-        {
-          type: "REPLACE",
-          index,
-          operation: operation.copyWith({ color: newColor }),
-        },
-        finished
-      );
+      dispatch({
+        type: "UPDATE",
+        index,
+        operation: operation.copyWith({ color: newColor }),
+        local,
+      });
     }
   };
 
@@ -39,8 +38,8 @@ function OperationsList() {
           {op instanceof RectDrawingOperation && (
             <ColorPicker
               color={op.color}
-              onChange={(newColor) => changeColorAt(index, newColor)}
-              onChangeEnd={() => changeColorAt(index, op.color, true)}
+              onChange={(newColor) => changeColorAt(index, newColor, true)}
+              onChangeEnd={() => changeColorAt(index, op.color, false)}
             />
           )}
           <button onClick={() => deleteAt(index)}>Delete</button>
