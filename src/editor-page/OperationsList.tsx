@@ -18,7 +18,6 @@ function OperationsList() {
 
   const changeColorAt = (index: number, newColor: string, local: boolean) => {
     const operation = operations[index];
-    console.log("local: " + local);
 
     if (operation instanceof RectDrawingOperation) {
       dispatch({
@@ -38,8 +37,8 @@ function OperationsList() {
           {op instanceof RectDrawingOperation && (
             <ColorPicker
               color={op.color}
-              onChange={(newColor) => changeColorAt(index, newColor, true)}
-              onChangeEnd={() => changeColorAt(index, op.color, false)}
+              onChange={(color) => changeColorAt(index, color, true)}
+              onChangeEnd={(color) => changeColorAt(index, color, false)}
             />
           )}
           <button onClick={() => deleteAt(index)}>Delete</button>

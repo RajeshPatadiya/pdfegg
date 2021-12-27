@@ -1,34 +1,19 @@
-import { useEffect, useState } from "react";
 import { HexColorPicker } from "react-colorful";
+import useDebounce from "../common/useDebounce";
 
 interface Props {
   color: string;
   onChange: (newColor: string) => void;
-  onChangeEnd: () => void;
+  onChangeEnd: (finalColor: string) => void;
 }
 
 function ColorPicker({ color, onChange, onChangeEnd }: Props) {
-  const [changing, setChanging] = useState(false);
+  const debounce = useDebounce(500);
 
   const handleChange = (newColor: string) => {
     onChange(newColor);
-    if (!changing) setChanging(true);
+    debounce(() => onChangeEnd(newColor));
   };
-
-  const handleChangeEnd = () => {
-    if (changing) {
-      onChangeEnd();
-      setChanging(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("pointerup", handleChangeEnd);
-
-    return () => {
-      document.removeEventListener("pointerup", handleChangeEnd);
-    };
-  });
 
   return <HexColorPicker color={color} onChange={handleChange} />;
 }
