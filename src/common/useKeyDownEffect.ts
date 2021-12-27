@@ -21,6 +21,8 @@ function useKeyDownEffect(
   callback: () => void
 ): void {
   const keyListener = (e: KeyboardEvent) => {
+    e.preventDefault();
+
     const currentCombination: KeyCombination = {
       ctrl: e.ctrlKey || e.metaKey,
       alt: e.altKey,
