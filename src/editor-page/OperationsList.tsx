@@ -1,4 +1,4 @@
-import RectDrawingOperation from "../pdf-generating/operations/RectDrawingOperation";
+import Operation from "../pdf-generating/operations/Operation";
 import OperationRow from "./OperationRow";
 import {
   usePageOperations,
@@ -9,17 +9,17 @@ function OperationsList() {
   const operations = usePageOperations();
   const dispatch = usePageOperationsDispatch();
 
-  const onColorChangeAt = (index: number, newColor: string, local: boolean) => {
-    const operation = operations[index];
-
-    if (operation instanceof RectDrawingOperation) {
-      dispatch({
-        type: "UPDATE",
-        index,
-        operation: operation.copyWith({ color: newColor }),
-        local,
-      });
-    }
+  const onUpdateAt = (
+    index: number,
+    updatedOperation: Operation,
+    local: boolean
+  ) => {
+    dispatch({
+      type: "UPDATE",
+      index,
+      operation: updatedOperation,
+      local,
+    });
   };
 
   const onDeleteAt = (index: number) => {
@@ -35,7 +35,7 @@ function OperationsList() {
         <OperationRow
           key={operation.creationEpoch}
           operation={operation}
-          onColorChange={onColorChangeAt.bind(null, index)}
+          onUpdate={onUpdateAt.bind(null, index)}
           onDelete={onDeleteAt.bind(null, index)}
         />
       ))}

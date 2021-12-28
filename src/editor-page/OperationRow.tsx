@@ -4,15 +4,23 @@ import ColorPicker from "./ColorPicker";
 
 interface Props {
   operation: Operation;
-  onColorChange: (newColor: string, local: boolean) => void;
+  onUpdate: (updatedOperation: Operation, local: boolean) => void;
   onDelete: () => void;
 }
 
-function OperationRow({ operation, onColorChange, onDelete }: Props) {
+function OperationRow({ operation, onUpdate, onDelete }: Props) {
+  const hasColor = operation instanceof RectDrawingOperation;
+
+  const onColorChange = (newColor: string, local: boolean) => {
+    if (hasColor) {
+      onUpdate(operation.copyWith({ color: newColor }), local);
+    }
+  };
+
   return (
     <li>
       {operation.getDisplayString()}
-      {operation instanceof RectDrawingOperation && (
+      {hasColor && (
         <ColorPicker
           color={operation.color}
           onChange={(color) => onColorChange(color, true)}
