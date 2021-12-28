@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import useKeyDownEffect from "../common/useKeyDownEffect";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import {
   useDocumentOperations,
@@ -28,6 +29,9 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
       newSelectedPageNumber: newPageNumber,
     });
   };
+
+  useKeyDownEffect({ key: "ArrowLeft" }, () => setPageNumber(pageNumber - 1));
+  useKeyDownEffect({ key: "ArrowRight" }, () => setPageNumber(pageNumber + 1));
 
   useEffect(() => {
     async function loadPage() {
