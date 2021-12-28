@@ -1,4 +1,5 @@
 import RectDrawingOperation from "../pdf-generating/operations/RectDrawingOperation";
+import ColorPicker from "./ColorPicker";
 import {
   usePageOperations,
   usePageOperationsDispatch,
@@ -15,14 +16,15 @@ function OperationsList() {
     });
   };
 
-  const changeColorAt = (index: number, newColor: string) => {
+  const changeColorAt = (index: number, newColor: string, local: boolean) => {
     const operation = operations[index];
 
     if (operation instanceof RectDrawingOperation) {
       dispatch({
-        type: "REPLACE",
+        type: "UPDATE",
         index,
         operation: operation.copyWith({ color: newColor }),
+        local,
       });
     }
   };
@@ -33,10 +35,10 @@ function OperationsList() {
         <li key={op.creationEpoch}>
           {op.getDisplayString()}
           {op instanceof RectDrawingOperation && (
-            <input
-              type="color"
-              value={op.color}
-              onChange={(e) => changeColorAt(index, e.target.value)}
+            <ColorPicker
+              color={op.color}
+              onChange={(color) => changeColorAt(index, color, true)}
+              onChangeEnd={(color) => changeColorAt(index, color, false)}
             />
           )}
           <button onClick={() => deleteAt(index)}>Delete</button>

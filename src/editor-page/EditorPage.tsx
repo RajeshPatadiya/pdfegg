@@ -5,7 +5,7 @@ import PdfViewer from "./PdfViewer";
 
 import "./EditorPage.css";
 import Header from "./Header";
-import { DocumentOperationsProvider } from "./DocumentOperationsContext";
+import EditorStateProvider from "./EditorStateProvider";
 
 function EditorPage() {
   const [pdfHandle, setPdfHandle] = useState<PdfHandle | null>(null);
@@ -20,7 +20,7 @@ function EditorPage() {
   }
 
   return (
-    <DocumentOperationsProvider>
+    <EditorStateProvider>
       <div className="editor-page">
         <Header>
           <h1>pdfegg</h1>
@@ -35,7 +35,7 @@ function EditorPage() {
 
         {pdfHandle && <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />}
       </div>
-    </DocumentOperationsProvider>
+    </EditorStateProvider>
   );
 }
 

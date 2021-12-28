@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import useKeyDownEffect from "../common/useKeyDownEffect";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import {
   useDocumentOperations,
@@ -16,8 +17,18 @@ interface PdfViewerProps {
 type LoadedPagesState = Record<number, PdfPageHandle>;
 
 function PdfViewer({ pdfHandle }: PdfViewerProps) {
-  const [pageNumber, setPageNumber] = useState(1);
   const [loadedPages, setLoadedPages] = useState<LoadedPagesState>({});
+
+  const documentOperations = useDocumentOperations();
+  const documentOperationsDispatch = useDocumentOperationsDispatch();
+
+  const pageNumber = documentOperations.selectedPageNumber;
+  const setPageNumber = (newPageNumber: number) => {
+    documentOperationsDispatch({
+      type: "CHANGE_SELECTED_PAGE",
+      newSelectedPageNumber: newPageNumber,
+    });
+  };
 
   useEffect(() => {
     async function loadPage() {
@@ -35,10 +46,6 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
   const pageHandle = loadedPages[pageNumber];
 
-  const documentOperations = useDocumentOperations();
-  const documentOperationsDispatch = useDocumentOperationsDispatch();
-  const pageOperations = documentOperations[pageNumber] || [];
-
   return (
     <section className="pdf-viewer">
       <section className="pdf-viewer__left-sidebar">
@@ -50,12 +57,12 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
       </section>
 
       <PageOperationsProvider
-        pageOperations={pageOperations}
-        dispatchPageOperationsUpdate={(updatedOperations) => {
+        state={documentOperations.operationsPerPage[pageNumber]}
+        dispatchState={(newState) => {
           documentOperationsDispatch({
             type: "UPDATE_PAGE_OPERATIONS",
             pageNumber: pageNumber,
-            updatedOperations: updatedOperations,
+            updatedOperations: newState,
           });
         }}
       >

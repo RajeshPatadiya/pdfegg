@@ -1,7 +1,7 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useState } from "react";
 import Operation from "../pdf-generating/operations/Operation";
 
-const PageOperationsContext = createContext<Operation[]>(null!);
+const PageOperationsContext = createContext<PageOperationsState>(null!);
 const PageOperationsDispatchContext = createContext<PageOperationsDispatch>(
   null!
 );
@@ -15,21 +15,30 @@ export function usePageOperationsDispatch() {
 }
 
 export function PageOperationsProvider({
-  pageOperations,
-  dispatchPageOperationsUpdate,
+  state,
+  dispatchState,
   children,
 }: {
-  pageOperations: Operation[];
-  dispatchPageOperationsUpdate: (updatedOperations: Operation[]) => void;
+  state: PageOperationsState;
+  dispatchState: (newState: PageOperationsState) => void;
   children: React.ReactNode;
 }) {
+  const [local, setLocal] = useState<PageOperationsState | null>();
+  state = local || state || initialState;
+
   const dispatch: PageOperationsDispatch = (action) => {
-    const updatedOperations = reducer(pageOperations, action);
-    dispatchPageOperationsUpdate(updatedOperations);
+    const newState = reducer(state, action);
+
+    if (action.type === "UPDATE" && action.local) {
+      setLocal(newState);
+    } else {
+      dispatchState(newState); // Must be called first
+      setLocal(null);
+    }
   };
 
   return (
-    <PageOperationsContext.Provider value={pageOperations}>
+    <PageOperationsContext.Provider value={state}>
       <PageOperationsDispatchContext.Provider value={dispatch}>
         {children}
       </PageOperationsDispatchContext.Provider>
@@ -37,8 +46,9 @@ export function PageOperationsProvider({
   );
 }
 
+type PageOperationsState = Operation[];
 type PageOperationsDispatch = (action: PageOperationsAction) => void;
-type PageOperationsAction = AddOperation | RemoveOperation | ReplaceOperation;
+type PageOperationsAction = AddOperation | RemoveOperation | UpdateOperation;
 
 interface AddOperation {
   type: "ADD";
@@ -50,16 +60,19 @@ interface RemoveOperation {
   index: number;
 }
 
-interface ReplaceOperation {
-  type: "REPLACE";
+interface UpdateOperation {
+  type: "UPDATE";
   index: number;
   operation: Operation;
+  local: boolean;
 }
 
+const initialState: PageOperationsState = [];
+
 function reducer(
-  operations: Operation[],
+  operations: PageOperationsState,
   action: PageOperationsAction
-): Operation[] {
+): PageOperationsState {
   switch (action.type) {
     case "ADD": {
       return [...operations, action.operation];
@@ -67,13 +80,10 @@ function reducer(
     case "REMOVE": {
       return operations.filter((_, index) => index != action.index);
     }
-    case "REPLACE": {
+    case "UPDATE": {
       return operations.map((op, index) =>
         index == action.index ? action.operation : op
       );
-    }
-    default: {
-      return operations;
     }
   }
 }

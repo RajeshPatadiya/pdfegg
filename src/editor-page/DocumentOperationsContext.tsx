@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useReducer } from "react";
+import React, { createContext, useContext } from "react";
 import Operation from "../pdf-generating/operations/Operation";
 
-const DocumentOperationsContext = createContext<DocumentOperations>(null!);
+const DocumentOperationsContext = createContext<DocumentOperationsState>(null!);
 const DocumentOperationsDispatchContext =
   createContext<DocumentOperationsDispatch>(null!);
 
@@ -14,17 +14,23 @@ export function useDocumentOperationsDispatch() {
 }
 
 export function DocumentOperationsProvider({
+  state,
+  dispatchState,
   children,
 }: {
+  state: DocumentOperationsState;
+  dispatchState: (newState: DocumentOperationsState) => void;
   children: React.ReactNode;
 }) {
-  const [documentOperations, dispatch] = useReducer(
-    documentOperationsReducer,
-    {}
-  );
+  state = state || initialState;
+
+  const dispatch: DocumentOperationsDispatch = (action) => {
+    const newState = reducer(state, action);
+    dispatchState(newState);
+  };
 
   return (
-    <DocumentOperationsContext.Provider value={documentOperations}>
+    <DocumentOperationsContext.Provider value={state}>
       <DocumentOperationsDispatchContext.Provider value={dispatch}>
         {children}
       </DocumentOperationsDispatchContext.Provider>
@@ -32,11 +38,19 @@ export function DocumentOperationsProvider({
   );
 }
 
-export type DocumentOperations = {
-  [pageNumber: number]: Operation[];
+type DocumentOperationsState = {
+  selectedPageNumber: number;
+  operationsPerPage: {
+    [pageNumber: number]: Operation[];
+  };
 };
 type DocumentOperationsDispatch = React.Dispatch<DocumentOperationsAction>;
-type DocumentOperationsAction = UpdatePageOperations;
+type DocumentOperationsAction = ChangeSelectedPage | UpdatePageOperations;
+
+interface ChangeSelectedPage {
+  type: "CHANGE_SELECTED_PAGE";
+  newSelectedPageNumber: number;
+}
 
 interface UpdatePageOperations {
   type: "UPDATE_PAGE_OPERATIONS";
@@ -44,16 +58,30 @@ interface UpdatePageOperations {
   updatedOperations: Operation[];
 }
 
-function documentOperationsReducer(
-  state: DocumentOperations,
+const initialState: DocumentOperationsState = {
+  selectedPageNumber: 1,
+  operationsPerPage: {},
+};
+
+function reducer(
+  state: DocumentOperationsState,
   action: DocumentOperationsAction
-): DocumentOperations {
+): DocumentOperationsState {
   switch (action.type) {
-    case "UPDATE_PAGE_OPERATIONS": {
-      return { ...state, [action.pageNumber]: action.updatedOperations };
+    case "CHANGE_SELECTED_PAGE": {
+      return {
+        ...state,
+        selectedPageNumber: action.newSelectedPageNumber,
+      };
     }
-    default: {
-      return state;
+    case "UPDATE_PAGE_OPERATIONS": {
+      return {
+        ...state,
+        operationsPerPage: {
+          ...state.operationsPerPage,
+          [action.pageNumber]: action.updatedOperations,
+        },
+      };
     }
   }
 }

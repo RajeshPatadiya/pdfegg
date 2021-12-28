@@ -24,10 +24,8 @@ function HighDpiCanvas({
   const canvasStyle = { width: `${width}px`, height: `${height}px` };
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas === null) throw Error("Failed to get canvas from ref.");
-    const context = canvas.getContext("2d");
-    if (context === null) throw Error("Failed to get context from canvas.");
+    const canvas = canvasRef.current!;
+    const context = canvas.getContext("2d")!;
 
     context.clearRect(0, 0, canvas.width, canvas.height);
     render(context);
