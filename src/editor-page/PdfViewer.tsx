@@ -30,9 +30,6 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
     });
   };
 
-  useKeyDownEffect({ key: "ArrowLeft" }, () => setPageNumber(pageNumber - 1));
-  useKeyDownEffect({ key: "ArrowRight" }, () => setPageNumber(pageNumber + 1));
-
   useEffect(() => {
     async function loadPage() {
       console.log(`load page ${pageNumber}`);
@@ -46,6 +43,14 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
       loadPage();
     }
   }, [pdfHandle, pageNumber]);
+
+  useKeyDownEffect({ key: "ArrowLeft" }, () => {
+    if (pageNumber > 1) setPageNumber(pageNumber - 1);
+  });
+
+  useKeyDownEffect({ key: "ArrowRight" }, () => {
+    if (pageNumber < pdfHandle.pageCount) setPageNumber(pageNumber + 1);
+  });
 
   const pageHandle = loadedPages[pageNumber];
 
