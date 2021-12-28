@@ -114,13 +114,12 @@ type BoxAction = BoxDragStartAction | BoxDragUpdateAction | BoxDragEndAction;
 
 const initialBoxState: BoxState = { operation: null };
 
-function boxStateReducer(state: BoxState, action: BoxAction) {
+function boxStateReducer(state: BoxState, action: BoxAction): BoxState {
   const { operation } = state;
 
   switch (action.type) {
     case "DRAG_START":
       return {
-        dragging: true,
         operation: new RectDrawingOperation(action.x, action.y, 0, 0),
       };
     case "DRAG_UPDATE":
@@ -137,8 +136,6 @@ function boxStateReducer(state: BoxState, action: BoxAction) {
       };
     case "DRAG_END":
       return { operation: null };
-    default:
-      return state;
   }
 }
 

@@ -88,8 +88,5 @@ function reducer(
         index == action.index ? action.operation : op
       );
     }
-    default: {
-      return operations;
-    }
   }
 }

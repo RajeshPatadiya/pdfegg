@@ -100,9 +100,6 @@ function reducer(
         currentStateIndex: i + 1,
       };
     }
-    default: {
-      return state;
-    }
   }
 }
 
