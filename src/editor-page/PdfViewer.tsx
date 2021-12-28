@@ -44,14 +44,6 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
     }
   }, [pdfHandle, pageNumber]);
 
-  useKeyDownEffect({ key: "ArrowLeft" }, () => {
-    if (pageNumber > 1) setPageNumber(pageNumber - 1);
-  });
-
-  useKeyDownEffect({ key: "ArrowRight" }, () => {
-    if (pageNumber < pdfHandle.pageCount) setPageNumber(pageNumber + 1);
-  });
-
   const pageHandle = loadedPages[pageNumber];
 
   return (
