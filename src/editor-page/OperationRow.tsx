@@ -1,6 +1,6 @@
 import Operation from "../pdf-generating/operations/Operation";
 import RectDrawingOperation from "../pdf-generating/operations/RectDrawingOperation";
-import ColorPicker from "./ColorPicker";
+import ColorButton from "./ColorButton";
 
 interface Props {
   operation: Operation;
@@ -21,7 +21,7 @@ function OperationRow({ operation, onUpdate, onDelete }: Props) {
     <li>
       {operation.getDisplayString()}
       {hasColor && (
-        <ColorPicker
+        <ColorButton
           color={operation.color}
           onChange={(color) => onColorChange(color, true)}
           onChangeEnd={(color) => onColorChange(color, false)}
