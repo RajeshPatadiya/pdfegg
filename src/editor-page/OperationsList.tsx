@@ -1,5 +1,5 @@
 import RectDrawingOperation from "../pdf-generating/operations/RectDrawingOperation";
-import ColorPicker from "./ColorPicker";
+import OperationRow from "./OperationRow";
 import {
   usePageOperations,
   usePageOperationsDispatch,
@@ -9,14 +9,7 @@ function OperationsList() {
   const operations = usePageOperations();
   const dispatch = usePageOperationsDispatch();
 
-  const deleteAt = (index: number) => {
-    dispatch({
-      type: "REMOVE",
-      index,
-    });
-  };
-
-  const changeColorAt = (index: number, newColor: string, local: boolean) => {
+  const onColorChangeAt = (index: number, newColor: string, local: boolean) => {
     const operation = operations[index];
 
     if (operation instanceof RectDrawingOperation) {
@@ -29,20 +22,22 @@ function OperationsList() {
     }
   };
 
+  const onDeleteAt = (index: number) => {
+    dispatch({
+      type: "REMOVE",
+      index,
+    });
+  };
+
   return (
     <ul>
-      {operations.map((op, index) => (
-        <li key={op.creationEpoch}>
-          {op.getDisplayString()}
-          {op instanceof RectDrawingOperation && (
-            <ColorPicker
-              color={op.color}
-              onChange={(color) => changeColorAt(index, color, true)}
-              onChangeEnd={(color) => changeColorAt(index, color, false)}
-            />
-          )}
-          <button onClick={() => deleteAt(index)}>Delete</button>
-        </li>
+      {operations.map((operation, index) => (
+        <OperationRow
+          key={operation.creationEpoch}
+          operation={operation}
+          onColorChange={onColorChangeAt.bind(null, index)}
+          onDelete={onDeleteAt.bind(null, index)}
+        />
       ))}
     </ul>
   );
