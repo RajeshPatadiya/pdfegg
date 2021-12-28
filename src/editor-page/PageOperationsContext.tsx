@@ -47,10 +47,7 @@ export function PageOperationsProvider({
 }
 
 type PageOperationsState = Operation[];
-type PageOperationsDispatch = (
-  action: PageOperationsAction,
-  finished?: boolean
-) => void;
+type PageOperationsDispatch = (action: PageOperationsAction) => void;
 type PageOperationsAction = AddOperation | RemoveOperation | UpdateOperation;
 
 interface AddOperation {
