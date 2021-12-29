@@ -44,7 +44,10 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
     }
   }, [pdfHandle, pageNumber]);
 
-  const pageHandle = loadedPages[pageNumber];
+  const pages = Array(pdfHandle.pageCount)
+    .fill(undefined)
+    .map((_, i) => loadedPages[i + 1]);
+  console.log(pages);
 
   return (
     <section className="pdf-viewer">
@@ -56,28 +59,30 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
         />
       </section>
 
-      <PageOperationsProvider
-        state={documentOperations.operationsPerPage[pageNumber]}
-        dispatchState={(newState) => {
-          documentOperationsDispatch({
-            type: "UPDATE_PAGE_OPERATIONS",
-            pageNumber: pageNumber,
-            updatedOperations: newState,
-          });
-        }}
-      >
-        <section className="pdf-viewer__content">
-          {pageHandle === undefined ? (
+      <section className="pdf-viewer__content">
+        {pages.map((pageHandle, index) =>
+          pageHandle === undefined ? (
             <p>Loading...</p>
           ) : (
-            <PageContainer width={800} pageHandle={pageHandle} />
-          )}
-        </section>
+            <PageOperationsProvider
+              state={documentOperations.operationsPerPage[index + 1]}
+              dispatchState={(newState) => {
+                documentOperationsDispatch({
+                  type: "UPDATE_PAGE_OPERATIONS",
+                  pageNumber: index + 1,
+                  updatedOperations: newState,
+                });
+              }}
+            >
+              <PageContainer width={800} pageHandle={pageHandle} />
+            </PageOperationsProvider>
+          )
+        )}
+      </section>
 
-        <section className="pdf-viewer__right-sidebar">
-          <OperationsList />
-        </section>
-      </PageOperationsProvider>
+      <section className="pdf-viewer__right-sidebar">
+        {/* <OperationsList /> */}
+      </section>
     </section>
   );
 }
