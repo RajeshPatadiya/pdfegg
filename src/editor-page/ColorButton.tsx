@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import useClickOutsideEffect from "../common/useClickOutsideEffect";
 import ColorPicker from "./ColorPicker";
 
@@ -10,17 +10,18 @@ interface Props {
 
 function ColorButton({ color, onChange, onChangeEnd }: Props) {
   const popoverRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
 
-  useClickOutsideEffect(popoverRef, () => setOpen(false));
+  useClickOutsideEffect([popoverRef, buttonRef], () => setOpen(false));
 
-  // TODO: Tapping on the button should toggle popover
   return (
     <div className="popover-container">
       <button
+        ref={buttonRef}
         className="color-button"
         style={{ backgroundColor: color }}
-        onClick={() => setOpen(true)}
+        onClick={() => setOpen(!open)}
       />
 
       {open && (
