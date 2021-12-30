@@ -24,8 +24,10 @@ class PdfPageHandle {
     await renderTask.promise;
   }
 
-  // TODO: Implement
-  async releaseResources() {}
+  async releaseResources() {
+    // TODO: Cancel rendering
+    this.pdfjsPage.cleanup();
+  }
 }
 
 export default PdfPageHandle;

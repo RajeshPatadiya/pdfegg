@@ -40,18 +40,12 @@ export function DocumentOperationsProvider({
 
 // Contains document manipulations that can be undone/redone.
 type DocumentOperationsState = {
-  selectedPageNumber: number;
   operationsPerPage: {
     [pageNumber: number]: Operation[];
   };
 };
 type DocumentOperationsDispatch = React.Dispatch<DocumentOperationsAction>;
-type DocumentOperationsAction = ChangeSelectedPage | UpdatePageOperations;
-
-interface ChangeSelectedPage {
-  type: "CHANGE_SELECTED_PAGE";
-  newSelectedPageNumber: number;
-}
+type DocumentOperationsAction = UpdatePageOperations;
 
 interface UpdatePageOperations {
   type: "UPDATE_PAGE_OPERATIONS";
@@ -60,7 +54,6 @@ interface UpdatePageOperations {
 }
 
 const initialState: DocumentOperationsState = {
-  selectedPageNumber: 1,
   operationsPerPage: {},
 };
 
@@ -69,12 +62,6 @@ function reducer(
   action: DocumentOperationsAction
 ): DocumentOperationsState {
   switch (action.type) {
-    case "CHANGE_SELECTED_PAGE": {
-      return {
-        ...state,
-        selectedPageNumber: action.newSelectedPageNumber,
-      };
-    }
     case "UPDATE_PAGE_OPERATIONS": {
       return {
         ...state,

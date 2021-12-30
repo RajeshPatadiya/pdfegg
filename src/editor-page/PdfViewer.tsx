@@ -1,14 +1,11 @@
 import { useEffect, useState } from "react";
-import useKeyDownEffect from "../common/useKeyDownEffect";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import {
   useDocumentOperations,
   useDocumentOperationsDispatch,
 } from "./DocumentOperationsContext";
-import OperationsList from "./OperationsList";
 import PageContainer from "./PageContainer";
 import { PageOperationsProvider } from "./PageOperationsContext";
-import PageSelector from "./PageSelector";
 
 interface PdfViewerProps {
   pdfHandle: PdfHandle;
@@ -22,16 +19,8 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
   const documentOperations = useDocumentOperations();
   const documentOperationsDispatch = useDocumentOperationsDispatch();
 
-  const pageNumber = documentOperations.selectedPageNumber;
-  const setPageNumber = (newPageNumber: number) => {
-    documentOperationsDispatch({
-      type: "CHANGE_SELECTED_PAGE",
-      newSelectedPageNumber: newPageNumber,
-    });
-  };
-
   useEffect(() => {
-    async function loadPage() {
+    async function loadPage(pageNumber: number) {
       console.log(`load page ${pageNumber}`);
       const pdfPageHandle = await pdfHandle.getPage(pageNumber);
       setLoadedPages((loadedPages) => {
@@ -39,10 +28,10 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
       });
     }
 
-    if (!loadedPages.hasOwnProperty(pageNumber)) {
-      loadPage();
+    for (let i = 1; i <= pdfHandle.pageCount; i++) {
+      loadPage(i);
     }
-  }, [pdfHandle, pageNumber]);
+  }, [pdfHandle]);
 
   const pages = Array(pdfHandle.pageCount)
     .fill(undefined)
@@ -51,20 +40,16 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
   return (
     <section className="pdf-viewer">
-      <section className="pdf-viewer__left-sidebar">
-        <PageSelector
-          selectedPageNumber={pageNumber}
-          totalPageCount={pdfHandle.pageCount}
-          onChanged={(pageNumber) => setPageNumber(pageNumber)}
-        />
-      </section>
+      <section className="pdf-viewer__left-sidebar"></section>
 
       <section className="pdf-viewer__content">
         {pages.map((pageHandle, index) =>
           pageHandle === undefined ? (
-            <p>Loading...</p>
+            // TODO: Replace with page-container of default size (first page size)
+            <p key={index}>Loading...</p>
           ) : (
             <PageOperationsProvider
+              key={index}
               state={documentOperations.operationsPerPage[index + 1]}
               dispatchState={(newState) => {
                 documentOperationsDispatch({
@@ -80,9 +65,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
         )}
       </section>
 
-      <section className="pdf-viewer__right-sidebar">
-        {/* <OperationsList /> */}
-      </section>
+      <section className="pdf-viewer__right-sidebar"></section>
     </section>
   );
 }
