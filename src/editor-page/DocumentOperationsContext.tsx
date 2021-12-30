@@ -38,6 +38,7 @@ export function DocumentOperationsProvider({
   );
 }
 
+// Contains document manipulations that can be undone/redone.
 type DocumentOperationsState = {
   selectedPageNumber: number;
   operationsPerPage: {
