@@ -35,7 +35,7 @@
   cursor: crosshair;
   margin: 32px auto;
   background-color: #fff;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
 }
 
 .page-container canvas {
