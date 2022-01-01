@@ -33,36 +33,43 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
     }
   }, [pdfHandle]);
 
-  const pages = Array(pdfHandle.pageCount)
-    .fill(undefined)
-    .map((_, i) => loadedPages[i + 1]);
-  console.log(pages);
+  const Page = (props: { index: number }) => {
+    const pageNumber = props.index + 1;
+    const pageHandle = loadedPages[pageNumber];
+
+    if (pageHandle === undefined) {
+      // TODO: Replace with page-container of default size (first page size)
+      return <p>Loading...</p>;
+    }
+
+    const pageOperations = documentOperations.operationsPerPage[pageNumber];
+
+    return (
+      <PageOperationsProvider
+        state={pageOperations}
+        dispatchState={(newState) => {
+          documentOperationsDispatch({
+            type: "UPDATE_PAGE_OPERATIONS",
+            pageNumber: pageNumber,
+            updatedOperations: newState,
+          });
+        }}
+      >
+        <PageContainer width={800} pageHandle={pageHandle} />
+      </PageOperationsProvider>
+    );
+  };
 
   return (
     <section className="pdf-viewer">
       <section className="pdf-viewer__left-sidebar"></section>
 
       <section className="pdf-viewer__content">
-        {pages.map((pageHandle, index) =>
-          pageHandle === undefined ? (
-            // TODO: Replace with page-container of default size (first page size)
-            <p key={index}>Loading...</p>
-          ) : (
-            <PageOperationsProvider
-              key={index}
-              state={documentOperations.operationsPerPage[index + 1]}
-              dispatchState={(newState) => {
-                documentOperationsDispatch({
-                  type: "UPDATE_PAGE_OPERATIONS",
-                  pageNumber: index + 1,
-                  updatedOperations: newState,
-                });
-              }}
-            >
-              <PageContainer width={800} pageHandle={pageHandle} />
-            </PageOperationsProvider>
-          )
-        )}
+        {Array(pdfHandle.pageCount)
+          .fill(undefined)
+          .map((_, index) => (
+            <Page index={index} />
+          ))}
       </section>
 
       <section className="pdf-viewer__right-sidebar"></section>
