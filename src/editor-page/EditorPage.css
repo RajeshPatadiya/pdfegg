@@ -26,15 +26,15 @@
 
 .pdf-viewer__content {
   overflow: scroll;
-  padding: 32px 0 64px;
+  padding-bottom: 32px;
   background-color: #f1f1f1;
 }
 
 .page-container {
   position: relative;
   cursor: crosshair;
-  margin: 0 auto;
-  border: 1px solid black;
+  margin: 32px auto;
+  background-color: #fff;
 }
 
 .page-container canvas {

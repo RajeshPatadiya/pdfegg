@@ -12,6 +12,10 @@ class PdfPageHandle {
     this.height = viewport.height;
   }
 
+  get aspectRatio(): number {
+    return this.width / this.height;
+  }
+
   async render(canvasContext: CanvasRenderingContext2D) {
     console.log("render page");
     const scale = canvasContext.canvas.width / this.width;
