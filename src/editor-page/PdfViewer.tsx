@@ -19,18 +19,16 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
   const documentOperations = useDocumentOperations();
   const documentOperationsDispatch = useDocumentOperationsDispatch();
 
-  useEffect(() => {
-    async function loadPage(pageNumber: number) {
-      console.log(`load page ${pageNumber}`);
-      const pdfPageHandle = await pdfHandle.getPage(pageNumber);
-      setLoadedPages((loadedPages) => {
-        return { ...loadedPages, [pageNumber]: pdfPageHandle };
-      });
-    }
+  async function loadPage(pageNumber: number) {
+    console.log(`load page ${pageNumber}`);
+    const pdfPageHandle = await pdfHandle.getPage(pageNumber);
+    setLoadedPages((loadedPages) => {
+      return { ...loadedPages, [pageNumber]: pdfPageHandle };
+    });
+  }
 
-    for (let i = 1; i <= pdfHandle.pageCount; i++) {
-      loadPage(i);
-    }
+  useEffect(() => {
+    loadPage(1);
   }, [pdfHandle]);
 
   const Page = (props: { index: number }) => {
@@ -68,7 +66,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
         {Array(pdfHandle.pageCount)
           .fill(undefined)
           .map((_, index) => (
-            <Page index={index} />
+            <Page key={index} index={index} />
           ))}
       </section>
 
