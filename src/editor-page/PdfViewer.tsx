@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import {
   useDocumentOperations,
@@ -19,13 +19,16 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
   const documentOperations = useDocumentOperations();
   const documentOperationsDispatch = useDocumentOperationsDispatch();
 
-  async function loadPage(pageNumber: number) {
-    console.log(`load page ${pageNumber}`);
-    const pdfPageHandle = await pdfHandle.getPage(pageNumber);
-    setLoadedPages((loadedPages) => {
-      return { ...loadedPages, [pageNumber]: pdfPageHandle };
-    });
-  }
+  const loadPage = useCallback(
+    async (pageNumber: number) => {
+      console.log(`load page ${pageNumber}`);
+      const pdfPageHandle = await pdfHandle.getPage(pageNumber);
+      setLoadedPages((loadedPages) => {
+        return { ...loadedPages, [pageNumber]: pdfPageHandle };
+      });
+    },
+    [pdfHandle]
+  );
 
   useEffect(() => {
     loadPage(1);
