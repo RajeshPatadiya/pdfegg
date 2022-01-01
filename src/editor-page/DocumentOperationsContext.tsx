@@ -9,6 +9,10 @@ export function useDocumentOperations() {
   return useContext(DocumentOperationsContext);
 }
 
+export function useDocumentPageOperations(pageNumber: number) {
+  return useContext(DocumentOperationsContext).operationsPerPage[pageNumber];
+}
+
 export function useDocumentOperationsDispatch() {
   return useContext(DocumentOperationsDispatchContext);
 }
