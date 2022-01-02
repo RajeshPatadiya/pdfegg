@@ -25,9 +25,8 @@
 }
 
 .pdf-viewer__content {
-  overflow: scroll;
-  padding-bottom: 32px;
   background-color: #f1f1f1;
+  overflow: hidden;
 }
 
 .page-container {

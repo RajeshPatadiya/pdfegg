@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import { Page } from "./Page";
 
@@ -34,23 +34,58 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
   return (
     <section className="pdf-viewer">
-      <section className="pdf-viewer__left-sidebar"></section>
+      <section className="pdf-viewer__left-sidebar">
+        <button onClick={() => loadPage(Object.keys(loadedPages).length + 1)}>
+          Load more
+        </button>
+      </section>
 
       <section className="pdf-viewer__content">
-        {Array(pdfHandle.pageCount)
-          .fill(undefined)
-          .map((_, index) => (
-            <Page
-              key={index}
-              pageNumber={index + 1}
-              pageHandle={loadedPages[index + 1]}
-              defaultAspectRatio={firstPage.aspectRatio}
-            />
-          ))}
+        <Window
+          itemCount={pdfHandle.pageCount}
+          buildItem={(index) => {
+            const pageNumber = index + 1;
+            return (
+              <Page
+                key={pageNumber}
+                pageNumber={pageNumber}
+                pageHandle={loadedPages[pageNumber]}
+                defaultAspectRatio={firstPage.aspectRatio}
+              />
+            );
+          }}
+          onVisibleChanged={(visibleStartIndex, visibleEndIndex) => {}}
+        />
       </section>
 
       <section className="pdf-viewer__right-sidebar"></section>
     </section>
+  );
+}
+
+interface WindowProps {
+  itemCount: number;
+  buildItem: (index: number) => ReactNode;
+  onVisibleChanged: (
+    visibleStartIndex: number,
+    visibleEndIndex: number
+  ) => void;
+}
+
+function Window(props: WindowProps) {
+  const items = Array(props.itemCount)
+    .fill(null)
+    .map((_, index) => props.buildItem(index));
+
+  return (
+    <div
+      style={{ height: "100%", overflow: "scroll" }}
+      onScroll={(e) =>
+        console.log(e.currentTarget.scrollTop, e.currentTarget.clientHeight)
+      }
+    >
+      {items}
+    </div>
   );
 }
 
