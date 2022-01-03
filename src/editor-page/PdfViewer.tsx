@@ -1,4 +1,5 @@
-import { ReactNode, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Window from "../common/Window";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import { Page } from "./Page";
 
@@ -54,38 +55,14 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
               />
             );
           }}
-          onVisibleChanged={(visibleStartIndex, visibleEndIndex) => {}}
+          onVisibleChanged={(visibleStartIndex, visibleEndIndex) => {
+            console.log(visibleStartIndex, visibleEndIndex);
+          }}
         />
       </section>
 
       <section className="pdf-viewer__right-sidebar"></section>
     </section>
-  );
-}
-
-interface WindowProps {
-  itemCount: number;
-  buildItem: (index: number) => ReactNode;
-  onVisibleChanged: (
-    visibleStartIndex: number,
-    visibleEndIndex: number
-  ) => void;
-}
-
-function Window(props: WindowProps) {
-  const items = Array(props.itemCount)
-    .fill(null)
-    .map((_, index) => props.buildItem(index));
-
-  return (
-    <div
-      style={{ height: "100%", overflow: "scroll" }}
-      onScroll={(e) =>
-        console.log(e.currentTarget.scrollTop, e.currentTarget.clientHeight)
-      }
-    >
-      {items}
-    </div>
   );
 }
 

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import HighDpiCanvas from "../common/HighDpiCanvas";
 import { PdfPageHandle } from "../pdf-rendering";
 import {
@@ -14,40 +14,39 @@ interface PageProps {
   defaultAspectRatio: number;
 }
 
-export function Page({
-  pageNumber,
-  pageHandle,
-  defaultAspectRatio,
-}: PageProps) {
-  const pageOperations = useDocumentPageOperations(pageNumber);
-  const documentOperationsDispatch = useDocumentOperationsDispatch();
+export const Page = React.forwardRef<HTMLDivElement, PageProps>(
+  ({ pageNumber, pageHandle, defaultAspectRatio }, ref) => {
+    const pageOperations = useDocumentPageOperations(pageNumber);
+    const documentOperationsDispatch = useDocumentOperationsDispatch();
 
-  const defaultWidth = 800;
+    const defaultWidth = 800;
 
-  if (pageHandle === undefined) {
+    if (pageHandle === undefined) {
+      return (
+        <PageContainer
+          ref={ref}
+          width={defaultWidth}
+          height={defaultWidth / defaultAspectRatio}
+        />
+      );
+    }
+
     return (
-      <PageContainer
-        width={defaultWidth}
-        height={defaultWidth / defaultAspectRatio}
-      />
+      <PageOperationsProvider
+        state={pageOperations}
+        dispatchState={(newState) => {
+          documentOperationsDispatch({
+            type: "UPDATE_PAGE_OPERATIONS",
+            pageNumber: pageNumber,
+            updatedOperations: newState,
+          });
+        }}
+      >
+        <RenderedPage ref={ref} width={defaultWidth} pageHandle={pageHandle} />
+      </PageOperationsProvider>
     );
   }
-
-  return (
-    <PageOperationsProvider
-      state={pageOperations}
-      dispatchState={(newState) => {
-        documentOperationsDispatch({
-          type: "UPDATE_PAGE_OPERATIONS",
-          pageNumber: pageNumber,
-          updatedOperations: newState,
-        });
-      }}
-    >
-      <RenderedPage width={defaultWidth} pageHandle={pageHandle} />
-    </PageOperationsProvider>
-  );
-}
+);
 
 interface PageContainerProps {
   width: number;
@@ -55,38 +54,42 @@ interface PageContainerProps {
   children?: React.ReactNode;
 }
 
-function PageContainer({ width, height, children }: PageContainerProps) {
-  const style = { width: `${width}px`, height: `${height}px` };
-  return (
-    <div className="page-container" style={style}>
-      {children}
-    </div>
-  );
-}
+const PageContainer = React.forwardRef<HTMLDivElement, PageContainerProps>(
+  ({ width, height, children }, ref) => {
+    const style = { width: `${width}px`, height: `${height}px` };
+    return (
+      <div ref={ref} className="page-container" style={style}>
+        {children}
+      </div>
+    );
+  }
+);
 
 interface RenderedPageProps {
   width: number;
   pageHandle: PdfPageHandle;
 }
 
-function RenderedPage({ width, pageHandle }: RenderedPageProps) {
-  const height = width / pageHandle.aspectRatio;
+const RenderedPage = React.forwardRef<HTMLDivElement, RenderedPageProps>(
+  ({ width, pageHandle }, ref) => {
+    const height = width / pageHandle.aspectRatio;
 
-  const renderPage = useCallback(
-    (canvasContext) => {
-      pageHandle.render(canvasContext);
-    },
-    [pageHandle]
-  );
+    const renderPage = useCallback(
+      (canvasContext) => {
+        pageHandle.render(canvasContext);
+      },
+      [pageHandle]
+    );
 
-  return (
-    <PageContainer width={width} height={height}>
-      <HighDpiCanvas width={width} height={height} render={renderPage} />
-      <PageOverlayCanvas
-        width={width}
-        height={height}
-        pageWidth={pageHandle.width}
-      />
-    </PageContainer>
-  );
-}
+    return (
+      <PageContainer ref={ref} width={width} height={height}>
+        <HighDpiCanvas width={width} height={height} render={renderPage} />
+        <PageOverlayCanvas
+          width={width}
+          height={height}
+          pageWidth={pageHandle.width}
+        />
+      </PageContainer>
+    );
+  }
+);
