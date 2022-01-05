@@ -57,6 +57,12 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
           }}
           onVisibleChanged={(visibleStartIndex, visibleEndIndex) => {
             console.log(visibleStartIndex, visibleEndIndex);
+            for (let i = visibleStartIndex; i <= visibleEndIndex; i++) {
+              const pageNumber = i + 1;
+              if (loadedPages[pageNumber] === undefined) {
+                loadPage(pageNumber);
+              }
+            }
           }}
         />
       </section>
