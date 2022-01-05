@@ -9,9 +9,17 @@ interface WindowProps {
   ) => void;
 }
 
+interface VisibleRange {
+  startIndex: number;
+  endIndex: number;
+}
+
 function Window(props: WindowProps) {
-  const [visibleStartIndex, setVisibleStartIndex] = useState(0);
-  const [visibleEndIndex, setVisibleEndIndex] = useState(0);
+  const [visibleRange, setVisibleRange] = useState<VisibleRange>({
+    startIndex: 0,
+    endIndex: 0,
+  });
+
   const itemsRef = useRef<Array<HTMLElement | null>>([]);
 
   // TODO: Update visible on first load
@@ -24,31 +32,46 @@ function Window(props: WindowProps) {
       })
     );
 
-  // Option 1:
-  // Pass refs to each item.
-  // Start from current state and iterate to add all visible and remove invisible.
-  // Find items that have y-coordinates overlap with [scrollTop, scrollTop + clientHeight]
-
-  // Start index should satisfy this condition:
-  // top of start item <= scrollTop && bottom of start item > scrollTop
-
-  // End index should satisfy this condition:
-  // top of end item < scrollTop + clientHeight && bottom of end item >= scrollTop + clientEnd
-
   return (
     <div
       style={{ height: "100%", overflow: "scroll" }}
-      ref={(e) => {}}
       onScroll={(e) => {
-        const topEdge = e.currentTarget.scrollTop;
-        const bottomEdge = topEdge + e.currentTarget.clientHeight;
+        const viewport = e.currentTarget;
+        const viewportTop = viewport.scrollTop;
+        const viewportBottom = viewportTop + viewport.clientHeight;
+        const items = itemsRef.current;
 
-        console.log(itemsRef.current);
+        function isItemVisible(item: HTMLElement): boolean {
+          const itemTop = item.offsetTop - viewport.offsetTop;
+          const itemBottom = itemTop + item.clientHeight;
+          const invisible =
+            itemBottom <= viewportTop || itemTop >= viewportBottom;
+          return !invisible;
+        }
 
-        // console.log(e.currentTarget.scrollTop, e.currentTarget.clientHeight)
-        // Find items that have y-coordinates in [scrollTop, scrollTop + clientHeight]
-        // Compare to existing visible items state.
-        // If different, then call onVisibleChanged
+        // TODO: Optimize the algorithm, most of the time visible range will remain unchanged
+        const newStart = items.findIndex((item) => isItemVisible(item!));
+        const newEnd =
+          items.length -
+          1 -
+          items
+            .slice()
+            .reverse()
+            .findIndex((item) => isItemVisible(item!));
+
+        // invisible or nothing
+        // visible item <- start
+        // ...
+        // visible item <- end
+        // invisible item or nothing
+
+        if (
+          newStart !== visibleRange.startIndex ||
+          newEnd !== visibleRange.endIndex
+        ) {
+          props.onVisibleChanged(newStart, newEnd);
+          setVisibleRange({ startIndex: newStart, endIndex: newEnd });
+        }
       }}
     >
       {items}
