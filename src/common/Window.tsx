@@ -20,12 +20,19 @@ function Window(props: WindowProps) {
     endIndex: 0,
   });
 
+  const viewportRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<Array<HTMLElement>>([]);
 
-  // TODO: Update visible on first load
-
   useEffect(() => {
-    console.log(itemsRef.current);
+    const initialVisibleRange = getVisibleItemRange(
+      viewportRef.current!,
+      itemsRef.current
+    );
+    props.onVisibleChanged(
+      initialVisibleRange.startIndex,
+      initialVisibleRange.endIndex
+    );
+    setVisibleRange(initialVisibleRange);
   }, []);
 
   const children = Array(props.itemCount)
@@ -38,6 +45,7 @@ function Window(props: WindowProps) {
 
   return (
     <div
+      ref={viewportRef}
       style={{ height: "100%", overflow: "scroll" }}
       onScroll={(e) => {
         // Validate pre-conditions:
