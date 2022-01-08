@@ -33,7 +33,8 @@ function Window(props: WindowProps) {
   useEffect(() => {
     const initialVisibleRange = getVisibleItemRange(
       viewportRef.current!,
-      itemsRef.current
+      itemsRef.current,
+      visibleRange
     );
     updateVisibleRange(initialVisibleRange);
   }, []);
@@ -51,7 +52,7 @@ function Window(props: WindowProps) {
       ref={viewportRef}
       style={{ height: "100%", overflow: "scroll" }}
       onScroll={(e) => {
-        // TODO: Check if can be replaced with:
+        // TODO: Replace with assert
         // assert(itemsRef.current.length === props.itemCount);
 
         // Validate pre-conditions:
@@ -62,7 +63,8 @@ function Window(props: WindowProps) {
 
         const newVisibleRange = getVisibleItemRange(
           e.currentTarget,
-          itemsRef.current
+          itemsRef.current,
+          visibleRange
         );
 
         if (
@@ -80,34 +82,66 @@ function Window(props: WindowProps) {
 
 function getVisibleItemRange(
   viewport: HTMLElement,
-  items: HTMLElement[]
+  items: HTMLElement[],
+  prevVisibleRange: VisibleRange
 ): VisibleRange {
   const viewportTop = viewport.scrollTop;
   const viewportBottom = viewportTop + viewport.clientHeight;
 
-  function isItemVisible(item: HTMLElement): boolean {
-    const itemTop = item.offsetTop - viewport.offsetTop;
-    const itemBottom = itemTop + item.clientHeight;
-    const invisible = itemBottom <= viewportTop || itemTop >= viewportBottom;
-    return !invisible;
+  function getItemPosition(item: HTMLElement): {
+    top: number;
+    bottom: number;
+  } {
+    const top = item.offsetTop - viewport.offsetTop;
+    const bottom = top + item.clientHeight;
+    return { top, bottom };
   }
 
-  // TODO: Optimize the algorithm, most of the time visible range will remain unchanged
-  const startIndex = items.findIndex((item) => isItemVisible(item));
-  const endIndex =
-    items.length -
-    1 -
-    items
-      .slice()
-      .reverse()
-      .findIndex((item) => isItemVisible(item));
+  function aboveViewport(itemIndex: number): boolean {
+    const item = items[itemIndex];
+    const { bottom } = getItemPosition(item);
+    return bottom <= viewportTop;
+  }
 
+  function inViewport(itemIndex: number): boolean {
+    return !aboveViewport(itemIndex) && !belowViewport(itemIndex);
+  }
+
+  function belowViewport(itemIndex: number): boolean {
+    const item = items[itemIndex];
+    const { top } = getItemPosition(item);
+    return top >= viewportBottom;
+  }
+
+  let { startIndex, endIndex } = prevVisibleRange;
+
+  if (aboveViewport(startIndex)) {
+    while (startIndex < items.length - 1 && aboveViewport(startIndex)) {
+      startIndex++;
+    }
+  } else {
+    while (startIndex > 0 && !aboveViewport(startIndex - 1)) {
+      startIndex--;
+    }
+  }
+
+  if (belowViewport(endIndex)) {
+    while (endIndex > 0 && belowViewport(endIndex)) {
+      endIndex--;
+    }
+  } else {
+    while (endIndex < items.length - 1 && !belowViewport(endIndex + 1)) {
+      endIndex++;
+    }
+  }
+
+  // TODO: Replace with assert
   // Validate post-conditions:
   const postConditions = [
-    isItemVisible(items[startIndex]),
-    isItemVisible(items[endIndex]),
-    startIndex === 0 || !isItemVisible(items[startIndex - 1]),
-    endIndex === items.length - 1 || !isItemVisible(items[endIndex + 1]),
+    inViewport(startIndex),
+    inViewport(endIndex),
+    startIndex === 0 || aboveViewport(startIndex - 1),
+    endIndex === items.length - 1 || belowViewport(endIndex + 1),
   ];
   if (postConditions.includes(false)) {
     throw Error("Window: Invalid post-conditions " + postConditions);
