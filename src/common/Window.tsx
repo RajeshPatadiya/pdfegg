@@ -20,15 +20,15 @@ function Window(props: WindowProps) {
     endIndex: 0,
   });
 
-  const itemsRef = useRef<Array<HTMLElement | null>>([]);
+  const itemsRef = useRef<Array<HTMLElement>>([]);
 
   // TODO: Update visible on first load
 
-  const items = Array(props.itemCount)
+  const children = Array(props.itemCount)
     .fill(null)
     .map((_, index) =>
       React.cloneElement(props.buildItem(index), {
-        ref: (el: HTMLElement | null) => (itemsRef.current[index] = el),
+        ref: (el: HTMLElement) => (itemsRef.current[index] = el),
       })
     );
 
@@ -42,10 +42,7 @@ function Window(props: WindowProps) {
         const items = itemsRef.current;
 
         // Validate pre-conditions:
-        const preConditions = [
-          items.length === props.itemCount,
-          !items.includes(null),
-        ];
+        const preConditions = [items.length === props.itemCount];
 
         if (preConditions.includes(false)) {
           throw Error("Window: Invalid pre-conditions " + preConditions);
@@ -90,7 +87,7 @@ function Window(props: WindowProps) {
         }
       }}
     >
-      {items}
+      {children}
     </div>
   );
 }
