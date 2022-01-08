@@ -41,6 +41,16 @@ function Window(props: WindowProps) {
         const viewportBottom = viewportTop + viewport.clientHeight;
         const items = itemsRef.current;
 
+        // Validate pre-conditions:
+        const preConditions = [
+          items.length === props.itemCount,
+          !items.includes(null),
+        ];
+
+        if (preConditions.includes(false)) {
+          throw Error("Window: Invalid pre-conditions " + preConditions);
+        }
+
         function isItemVisible(item: HTMLElement): boolean {
           const itemTop = item.offsetTop - viewport.offsetTop;
           const itemBottom = itemTop + item.clientHeight;
