@@ -19,20 +19,23 @@ function Window(props: WindowProps) {
     startIndex: 0,
     endIndex: 0,
   });
-
   const viewportRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<Array<HTMLElement>>([]);
+
+  function updateVisibleRange(newVisibleRange: VisibleRange) {
+    props.onVisibleChanged(
+      newVisibleRange.startIndex,
+      newVisibleRange.endIndex
+    );
+    setVisibleRange(newVisibleRange);
+  }
 
   useEffect(() => {
     const initialVisibleRange = getVisibleItemRange(
       viewportRef.current!,
       itemsRef.current
     );
-    props.onVisibleChanged(
-      initialVisibleRange.startIndex,
-      initialVisibleRange.endIndex
-    );
-    setVisibleRange(initialVisibleRange);
+    updateVisibleRange(initialVisibleRange);
   }, []);
 
   const children = Array(props.itemCount)
@@ -63,11 +66,7 @@ function Window(props: WindowProps) {
           newVisibleRange.startIndex !== visibleRange.startIndex ||
           newVisibleRange.endIndex !== visibleRange.endIndex
         ) {
-          props.onVisibleChanged(
-            newVisibleRange.startIndex,
-            newVisibleRange.endIndex
-          );
-          setVisibleRange(newVisibleRange);
+          updateVisibleRange(newVisibleRange);
         }
       }}
     >
