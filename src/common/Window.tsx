@@ -59,11 +59,17 @@ function Window(props: WindowProps) {
             .reverse()
             .findIndex((item) => isItemVisible(item!));
 
-        // invisible or nothing
-        // visible item <- start
-        // ...
-        // visible item <- end
-        // invisible item or nothing
+        // Validate post-conditions:
+        const postConditions = [
+          isItemVisible(items[newStart]!),
+          isItemVisible(items[newEnd]!),
+          newStart === 0 || !isItemVisible(items[newStart - 1]!),
+          newEnd === items.length - 1 || !isItemVisible(items[newEnd + 1]!),
+        ];
+
+        if (postConditions.includes(false)) {
+          throw Error("Window: Invalid post-conditions " + postConditions);
+        }
 
         if (
           newStart !== visibleRange.startIndex ||
