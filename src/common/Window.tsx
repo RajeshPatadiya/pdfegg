@@ -83,29 +83,29 @@ function getVisibleItemRange(
   }
 
   // TODO: Optimize the algorithm, most of the time visible range will remain unchanged
-  const newStart = items.findIndex((item) => isItemVisible(item!));
-  const newEnd =
+  const startIndex = items.findIndex((item) => isItemVisible(item));
+  const endIndex =
     items.length -
     1 -
     items
       .slice()
       .reverse()
-      .findIndex((item) => isItemVisible(item!));
+      .findIndex((item) => isItemVisible(item));
 
   // Validate post-conditions:
   const postConditions = [
-    isItemVisible(items[newStart]!),
-    isItemVisible(items[newEnd]!),
-    newStart === 0 || !isItemVisible(items[newStart - 1]!),
-    newEnd === items.length - 1 || !isItemVisible(items[newEnd + 1]!),
+    isItemVisible(items[startIndex]),
+    isItemVisible(items[endIndex]),
+    startIndex === 0 || !isItemVisible(items[startIndex - 1]),
+    endIndex === items.length - 1 || !isItemVisible(items[endIndex + 1]),
   ];
   if (postConditions.includes(false)) {
     throw Error("Window: Invalid post-conditions " + postConditions);
   }
 
   return {
-    startIndex: newStart,
-    endIndex: newEnd,
+    startIndex: startIndex,
+    endIndex: endIndex,
   };
 }
 
