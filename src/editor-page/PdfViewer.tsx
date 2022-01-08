@@ -10,36 +10,25 @@ interface PdfViewerProps {
 type LoadedPagesState = Record<number, PdfPageHandle>;
 
 function PdfViewer({ pdfHandle }: PdfViewerProps) {
+  const [defaultAspectRatio, setDefaultAspectRatio] = useState<number>();
   const [loadedPages, setLoadedPages] = useState<LoadedPagesState>({});
 
-  const loadPage = useCallback(
-    async (pageNumber: number) => {
-      console.log(`load page ${pageNumber}`);
-      const pdfPageHandle = await pdfHandle.getPage(pageNumber);
-      setLoadedPages((loadedPages) => {
-        return { ...loadedPages, [pageNumber]: pdfPageHandle };
-      });
-    },
-    [pdfHandle]
-  );
-
   useEffect(() => {
-    loadPage(1);
+    async function loadDefaultAspectRatio() {
+      const firstPage = await pdfHandle.getPage(1);
+      setDefaultAspectRatio(firstPage.aspectRatio);
+    }
+
+    loadDefaultAspectRatio();
   }, [pdfHandle]);
 
-  if (loadedPages[1] === undefined) {
-    return <p>Loading first page</p>;
+  if (defaultAspectRatio === undefined) {
+    return <p>Loading default aspect ratio</p>;
   }
-
-  const firstPage = loadedPages[1];
 
   return (
     <section className="pdf-viewer">
-      <section className="pdf-viewer__left-sidebar">
-        <button onClick={() => loadPage(Object.keys(loadedPages).length + 1)}>
-          Load more
-        </button>
-      </section>
+      <section className="pdf-viewer__left-sidebar"></section>
 
       <section className="pdf-viewer__content">
         <Window
@@ -51,18 +40,45 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
                 key={pageNumber}
                 pageNumber={pageNumber}
                 pageHandle={loadedPages[pageNumber]}
-                defaultAspectRatio={firstPage.aspectRatio}
+                defaultAspectRatio={defaultAspectRatio}
               />
             );
           }}
-          onVisibleChanged={(visibleStartIndex, visibleEndIndex) => {
+          onVisibleChanged={async (visibleStartIndex, visibleEndIndex) => {
             console.log(visibleStartIndex, visibleEndIndex);
-            for (let i = visibleStartIndex; i <= visibleEndIndex; i++) {
+
+            // const visibleCount = visibleEndIndex - visibleStartIndex + 1;
+            // const maxLoadedCount = Math.max(visibleCount + 2, 10);
+
+            const newState: LoadedPagesState = {};
+
+            // Preload at least one invisible page on top and bottom.
+            const startIndex = Math.max(0, visibleStartIndex - 1);
+            const endIndex = Math.min(
+              pdfHandle.pageCount - 1,
+              visibleEndIndex + 1
+            );
+
+            for (let i = startIndex; i <= endIndex; i++) {
               const pageNumber = i + 1;
-              if (loadedPages[pageNumber] === undefined) {
-                loadPage(pageNumber);
+
+              if (loadedPages[pageNumber] !== undefined) {
+                newState[pageNumber] = loadedPages[pageNumber];
+              } else {
+                newState[pageNumber] = await pdfHandle.getPage(pageNumber);
               }
             }
+
+            // Unload from memory pages made invisible.
+            Object.keys(loadedPages)
+              .map(Number)
+              .filter((pageNumber) => newState[pageNumber] === undefined)
+              .forEach((pageNumber) =>
+                loadedPages[pageNumber].releaseResources()
+              );
+
+            setLoadedPages(newState);
+            console.log(Object.keys(newState));
           }}
         />
       </section>

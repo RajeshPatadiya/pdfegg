@@ -29,7 +29,6 @@ class PdfPageHandle {
   }
 
   async releaseResources() {
-    // TODO: Cancel rendering
     this.pdfjsPage.cleanup();
   }
 }
