@@ -51,6 +51,9 @@ function Window(props: WindowProps) {
       ref={viewportRef}
       style={{ height: "100%", overflow: "scroll" }}
       onScroll={(e) => {
+        // TODO: Check if can be replaced with:
+        // assert(itemsRef.current.length === props.itemCount);
+
         // Validate pre-conditions:
         const preConditions = [itemsRef.current.length === props.itemCount];
         if (preConditions.includes(false)) {
