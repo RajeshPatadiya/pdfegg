@@ -35,24 +35,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
       <section className="pdf-viewer__content">
         <Window
-          itemCount={pdfHandle.pageCount}
-          buildItem={(index) => {
-            const pageNumber = index + 1;
-            return (
-              <Page
-                key={pageNumber}
-                pageNumber={pageNumber}
-                pageHandle={pages[index]}
-                defaultAspectRatio={defaultAspectRatio}
-              />
-            );
-          }}
           onVisibleChanged={async (visibleStartIndex, visibleEndIndex) => {
-            console.log(visibleStartIndex, visibleEndIndex);
-
-            // const visibleCount = visibleEndIndex - visibleStartIndex + 1;
-            // const maxLoadedCount = Math.max(visibleCount + 2, 10);
-
             const newPages: PagesState = Array(pages.length).fill(null);
 
             // Preload at least one invisible page on top and bottom.
@@ -70,7 +53,19 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
             setPages(newPages);
           }}
-        />
+        >
+          {pages.map((pageHandle, i) => {
+            const pageNumber = i + 1;
+            return (
+              <Page
+                key={pageNumber}
+                pageNumber={pageNumber}
+                pageHandle={pageHandle}
+                defaultAspectRatio={defaultAspectRatio}
+              />
+            );
+          })}
+        </Window>
       </section>
 
       <section className="pdf-viewer__right-sidebar"></section>

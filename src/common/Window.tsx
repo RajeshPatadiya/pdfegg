@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 interface WindowProps {
-  itemCount: number;
-  buildItem: (index: number) => React.ReactElement;
+  children: React.ReactElement[];
   onVisibleChanged: (
     visibleStartIndex: number,
     visibleEndIndex: number
@@ -14,7 +13,7 @@ interface VisibleRange {
   endIndex: number;
 }
 
-function Window(props: WindowProps) {
+function Window({ children, onVisibleChanged }: WindowProps) {
   const [visibleRange, setVisibleRange] = useState<VisibleRange>({
     startIndex: 0,
     endIndex: 0,
@@ -23,10 +22,7 @@ function Window(props: WindowProps) {
   const itemsRef = useRef<Array<HTMLElement>>([]);
 
   function updateVisibleRange(newVisibleRange: VisibleRange) {
-    props.onVisibleChanged(
-      newVisibleRange.startIndex,
-      newVisibleRange.endIndex
-    );
+    onVisibleChanged(newVisibleRange.startIndex, newVisibleRange.endIndex);
     setVisibleRange(newVisibleRange);
   }
 
@@ -39,24 +35,16 @@ function Window(props: WindowProps) {
     updateVisibleRange(initialVisibleRange);
   }, []);
 
-  const children = Array(props.itemCount)
-    .fill(null)
-    .map((_, index) =>
-      React.cloneElement(props.buildItem(index), {
-        ref: (el: HTMLElement) => (itemsRef.current[index] = el),
-      })
-    );
-
   return (
     <div
       ref={viewportRef}
       style={{ height: "100%", overflow: "scroll" }}
       onScroll={(e) => {
         // TODO: Replace with assert
-        // assert(itemsRef.current.length === props.itemCount);
+        // assert(itemsRef.current.length === children.length);
 
         // Validate pre-conditions:
-        const preConditions = [itemsRef.current.length === props.itemCount];
+        const preConditions = [itemsRef.current.length === children.length];
         if (preConditions.includes(false)) {
           throw Error("Window: Invalid pre-conditions " + preConditions);
         }
@@ -75,7 +63,11 @@ function Window(props: WindowProps) {
         }
       }}
     >
-      {children}
+      {children.map((child, i) =>
+        React.cloneElement(child, {
+          ref: (el: HTMLElement) => (itemsRef.current[i] = el),
+        })
+      )}
     </div>
   );
 }
