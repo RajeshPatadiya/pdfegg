@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import useDebounce from "../common/useDebounce";
 import Window from "../common/Window";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import { Page } from "./Page";
@@ -24,6 +25,8 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
     loadDefaultAspectRatio();
   }, [pdfHandle]);
+
+  const debounce = useDebounce(150);
 
   if (defaultAspectRatio === undefined) {
     return <p>Loading default aspect ratio</p>;
@@ -53,7 +56,11 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
       <section className="pdf-viewer__left-sidebar"></section>
 
       <section className="pdf-viewer__content">
-        <Window onVisibleChanged={handleVisibleChanged}>
+        <Window
+          onVisibleChanged={(start, end) =>
+            debounce(() => handleVisibleChanged(start, end))
+          }
+        >
           {pages.map((pageHandle, i) => {
             const pageNumber = i + 1;
             return (
