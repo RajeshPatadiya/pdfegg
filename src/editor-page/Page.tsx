@@ -10,7 +10,7 @@ import PageOverlayCanvas from "./PageOverlayCanvas";
 
 interface PageProps {
   pageNumber: number;
-  pageHandle?: PdfPageHandle;
+  pageHandle: PdfPageHandle | null;
   defaultAspectRatio: number;
 }
 
@@ -21,7 +21,7 @@ export const Page = React.forwardRef<HTMLDivElement, PageProps>(
 
     const defaultWidth = 800;
 
-    if (pageHandle === undefined) {
+    if (pageHandle === null) {
       return (
         <PageContainer
           ref={ref}

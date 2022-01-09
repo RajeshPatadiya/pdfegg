@@ -7,11 +7,14 @@ interface PdfViewerProps {
   pdfHandle: PdfHandle;
 }
 
-type LoadedPagesState = Record<number, PdfPageHandle>;
+type PagesState = Array<PdfPageHandle | null>;
 
 function PdfViewer({ pdfHandle }: PdfViewerProps) {
   const [defaultAspectRatio, setDefaultAspectRatio] = useState<number>();
-  const [loadedPages, setLoadedPages] = useState<LoadedPagesState>({});
+
+  const [pages, setPages] = useState<PagesState>(
+    Array(pdfHandle.pageCount).fill(null)
+  );
 
   useEffect(() => {
     async function loadDefaultAspectRatio() {
@@ -39,7 +42,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
               <Page
                 key={pageNumber}
                 pageNumber={pageNumber}
-                pageHandle={loadedPages[pageNumber]}
+                pageHandle={pages[index]}
                 defaultAspectRatio={defaultAspectRatio}
               />
             );
@@ -50,35 +53,22 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
             // const visibleCount = visibleEndIndex - visibleStartIndex + 1;
             // const maxLoadedCount = Math.max(visibleCount + 2, 10);
 
-            const newState: LoadedPagesState = {};
+            const newPages: PagesState = Array(pages.length).fill(null);
 
             // Preload at least one invisible page on top and bottom.
             const startIndex = Math.max(0, visibleStartIndex - 1);
-            const endIndex = Math.min(
-              pdfHandle.pageCount - 1,
-              visibleEndIndex + 1
-            );
+            const endIndex = Math.min(pages.length - 1, visibleEndIndex + 1);
 
             for (let i = startIndex; i <= endIndex; i++) {
-              const pageNumber = i + 1;
-
-              if (loadedPages[pageNumber] !== undefined) {
-                newState[pageNumber] = loadedPages[pageNumber];
-              } else {
-                newState[pageNumber] = await pdfHandle.getPage(pageNumber);
-              }
+              newPages[i] = pages[i] || (await pdfHandle.getPage(i + 1));
             }
 
-            // Unload from memory pages made invisible.
-            Object.keys(loadedPages)
-              .map(Number)
-              .filter((pageNumber) => newState[pageNumber] === undefined)
-              .forEach((pageNumber) =>
-                loadedPages[pageNumber].releaseResources()
-              );
+            // Unload from memory removed pages.
+            pages
+              .filter((handle, i) => handle !== null && newPages[i] === null)
+              .forEach((handle) => handle?.releaseResources());
 
-            setLoadedPages(newState);
-            console.log(Object.keys(newState));
+            setPages(newPages);
           }}
         />
       </section>
