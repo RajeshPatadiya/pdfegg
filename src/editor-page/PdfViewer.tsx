@@ -29,31 +29,31 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
     return <p>Loading default aspect ratio</p>;
   }
 
+  async function handleVisibleChanged(startIndex: number, endIndex: number) {
+    const newPages: PagesState = Array(pages.length).fill(null);
+
+    // Preload at least one invisible page on top and bottom.
+    const start = Math.max(0, startIndex - 1);
+    const end = Math.min(pages.length - 1, endIndex + 1);
+
+    for (let i = start; i <= end; i++) {
+      newPages[i] = pages[i] || (await pdfHandle.getPage(i + 1));
+    }
+
+    // Unload from memory removed pages.
+    pages
+      .filter((handle, i) => handle !== null && newPages[i] === null)
+      .forEach((handle) => handle?.releaseResources());
+
+    setPages(newPages);
+  }
+
   return (
     <section className="pdf-viewer">
       <section className="pdf-viewer__left-sidebar"></section>
 
       <section className="pdf-viewer__content">
-        <Window
-          onVisibleChanged={async (visibleStartIndex, visibleEndIndex) => {
-            const newPages: PagesState = Array(pages.length).fill(null);
-
-            // Preload at least one invisible page on top and bottom.
-            const startIndex = Math.max(0, visibleStartIndex - 1);
-            const endIndex = Math.min(pages.length - 1, visibleEndIndex + 1);
-
-            for (let i = startIndex; i <= endIndex; i++) {
-              newPages[i] = pages[i] || (await pdfHandle.getPage(i + 1));
-            }
-
-            // Unload from memory removed pages.
-            pages
-              .filter((handle, i) => handle !== null && newPages[i] === null)
-              .forEach((handle) => handle?.releaseResources());
-
-            setPages(newPages);
-          }}
-        >
+        <Window onVisibleChanged={handleVisibleChanged}>
           {pages.map((pageHandle, i) => {
             const pageNumber = i + 1;
             return (
