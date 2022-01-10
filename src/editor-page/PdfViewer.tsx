@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useDebounce from "../common/useDebounce";
+import useDebounce from "../common/hooks/useDebounce";
 import Window from "../common/Window";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import { Page } from "./Page";

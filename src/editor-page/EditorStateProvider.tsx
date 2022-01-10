@@ -1,5 +1,5 @@
 import { useReducer } from "react";
-import useKeyDownEffect from "../common/useKeyDownEffect";
+import useKeyDownEffect from "../common/hooks/useKeyDownEffect";
 import { DocumentOperationsProvider } from "./DocumentOperationsContext";
 
 const maxHistoryStackSize = 100;

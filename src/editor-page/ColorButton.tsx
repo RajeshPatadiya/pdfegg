@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import useClickOutsideEffect from "../common/useClickOutsideEffect";
+import useClickOutsideEffect from "../common/hooks/useClickOutsideEffect";
 import ColorPicker from "./ColorPicker";
 
 interface Props {
