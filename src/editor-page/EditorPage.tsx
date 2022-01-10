@@ -2,12 +2,12 @@ import { useState } from "react";
 import { PdfHandle } from "../pdf-rendering";
 import DownloadButton from "./DownloadButton";
 import PdfViewer from "./PdfViewer";
-import { MousePointer2, Type, Square } from "lucide-react";
 
 import logo from "./logo.svg";
 import "./EditorPage.css";
 import Header from "./Header";
 import EditorStateProvider from "./EditorStateProvider";
+import Toolbar from "./Toolbar";
 
 function EditorPage() {
   const [pdfHandle, setPdfHandle] = useState<PdfHandle | null>(null);
@@ -28,6 +28,8 @@ function EditorPage() {
         <Header>
           <img src={logo} className="App-logo" alt="pdfegg" />
 
+          <Toolbar />
+
           <input
             type="file"
             name="pdf-input"
@@ -35,10 +37,6 @@ function EditorPage() {
             onChange={(e) => onFileChange(e.target.files)}
           />
           {pdfHandle && <DownloadButton pdfBytes={pdfHandle.bytes} />}
-
-          <MousePointer2 />
-          <Type />
-          <Square />
         </Header>
 
         {pdfHandle && <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />}
