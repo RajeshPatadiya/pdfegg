@@ -28,7 +28,7 @@ function EditorPage() {
         <Header>
           <img src={logo} className="App-logo" alt="pdfegg" />
 
-          <Toolbar />
+          <Toolbar selectedTool="move" />
 
           <input
             type="file"

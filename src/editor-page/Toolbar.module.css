@@ -1,0 +1,23 @@
+.toolbar {
+  display: flex;
+  flex-direction: row;
+}
+
+.well {
+  width: 48px;
+  height: 48px;
+  margin: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.well:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.well--selected,
+.well--selected:hover {
+  background-color: #ff8a00;
+}
