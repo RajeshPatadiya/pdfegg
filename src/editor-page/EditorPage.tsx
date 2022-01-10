@@ -32,13 +32,15 @@ function EditorPage() {
 
           <Toolbar selectedTool={selectedTool} onChanged={setSelectedTool} />
 
-          <input
-            type="file"
-            name="pdf-input"
-            accept=".pdf"
-            onChange={(e) => onFileChange(e.target.files)}
-          />
-          {pdfHandle && <DownloadButton pdfBytes={pdfHandle.bytes} />}
+          <div>
+            <input
+              type="file"
+              name="pdf-input"
+              accept=".pdf"
+              onChange={(e) => onFileChange(e.target.files)}
+            />
+            {pdfHandle && <DownloadButton pdfBytes={pdfHandle.bytes} />}
+          </div>
         </Header>
 
         {pdfHandle && <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />}
