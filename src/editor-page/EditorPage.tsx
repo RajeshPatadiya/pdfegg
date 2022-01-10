@@ -7,10 +7,12 @@ import logo from "./logo.svg";
 import "./EditorPage.css";
 import Header from "./Header";
 import EditorStateProvider from "./EditorStateProvider";
-import Toolbar from "./Toolbar";
+import Toolbar, { Tool } from "./Toolbar";
 
 function EditorPage() {
   const [pdfHandle, setPdfHandle] = useState<PdfHandle | null>(null);
+
+  const [selectedTool, setSelectedTool] = useState<Tool>("move");
 
   async function onFileChange(files: FileList | null) {
     if (files === null || files.length === 0) return;
@@ -28,7 +30,7 @@ function EditorPage() {
         <Header>
           <img src={logo} className="App-logo" alt="pdfegg" />
 
-          <Toolbar selectedTool="move" />
+          <Toolbar selectedTool={selectedTool} onChanged={setSelectedTool} />
 
           <input
             type="file"
