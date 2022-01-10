@@ -20,6 +20,7 @@ function EditorPage() {
   }
 
   return (
+    // TODO: State must be linked to a particular pdf.
     <EditorStateProvider>
       <div className="editor-page">
         <Header>

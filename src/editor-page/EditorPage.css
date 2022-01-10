@@ -14,7 +14,7 @@
 
 .pdf-viewer {
   display: grid;
-  grid-template-columns: auto 1fr 300px;
+  grid-template-columns: 200px 1fr 200px;
   overflow: hidden;
 }
 
@@ -25,16 +25,16 @@
 }
 
 .pdf-viewer__content {
-  overflow: scroll;
-  padding: 32px 0 64px;
   background-color: #f1f1f1;
+  overflow: hidden;
 }
 
 .page-container {
   position: relative;
   cursor: crosshair;
-  margin: 0 auto;
-  border: 1px solid black;
+  margin: 32px auto;
+  background-color: #fff;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
 }
 
 .page-container canvas {
