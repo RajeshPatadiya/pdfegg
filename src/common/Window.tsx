@@ -40,14 +40,7 @@ function Window({ children, onVisibleChanged }: WindowProps) {
       ref={viewportRef}
       style={{ height: "100%", overflow: "scroll" }}
       onScroll={(e) => {
-        // TODO: Replace with assert
-        // assert(itemsRef.current.length === children.length);
-
-        // Validate pre-conditions:
-        const preConditions = [itemsRef.current.length === children.length];
-        if (preConditions.includes(false)) {
-          throw Error("Window: Invalid pre-conditions " + preConditions);
-        }
+        console.assert(itemsRef.current.length === children.length);
 
         const newVisibleRange = getVisibleItemRange(
           e.currentTarget,
@@ -127,17 +120,10 @@ function getVisibleItemRange(
     }
   }
 
-  // TODO: Replace with assert
-  // Validate post-conditions:
-  const postConditions = [
-    inViewport(startIndex),
-    inViewport(endIndex),
-    startIndex === 0 || aboveViewport(startIndex - 1),
-    endIndex === items.length - 1 || belowViewport(endIndex + 1),
-  ];
-  if (postConditions.includes(false)) {
-    throw Error("Window: Invalid post-conditions " + postConditions);
-  }
+  console.assert(inViewport(startIndex));
+  console.assert(inViewport(endIndex));
+  console.assert(startIndex === 0 || aboveViewport(startIndex - 1));
+  console.assert(endIndex === items.length - 1 || belowViewport(endIndex + 1));
 
   return {
     startIndex: startIndex,
