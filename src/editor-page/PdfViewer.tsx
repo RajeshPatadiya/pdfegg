@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import HighDpiCanvas from "../common/HighDpiCanvas";
 import useDebounce from "../common/hooks/useDebounce";
+import LayoutBuilder from "../common/LayoutBuilder";
 import Window from "../common/Window";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import { Page } from "./Page";
@@ -73,6 +75,19 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
             );
           })}
         </Window>
+
+        <LayoutBuilder
+          buildLayout={(width, height) => (
+            <HighDpiCanvas
+              width={width}
+              height={height}
+              className="content__overlay"
+              render={(context) => {
+                context.fillRect(100, 100, 100, 100);
+              }}
+            />
+          )}
+        />
       </section>
 
       <section className="pdf-viewer__right-sidebar"></section>

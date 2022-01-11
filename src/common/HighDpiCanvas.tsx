@@ -4,6 +4,7 @@ interface HighDpiCanvasProps {
   width: number;
   height: number;
   render: (canvasContext: CanvasRenderingContext2D) => void;
+  className?: string;
   onMouseDown?: MouseEventHandler<HTMLCanvasElement>;
   onMouseMove?: MouseEventHandler<HTMLCanvasElement>;
   onMouseUp?: MouseEventHandler<HTMLCanvasElement>;
@@ -14,7 +15,7 @@ function HighDpiCanvas({
   width,
   height,
   render,
-  ...eventHandlers
+  ...otherProps
 }: HighDpiCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -37,7 +38,7 @@ function HighDpiCanvas({
       width={canvasWidth}
       height={canvasHeight}
       style={canvasStyle}
-      {...eventHandlers}
+      {...otherProps}
     />
   );
 }
