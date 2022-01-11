@@ -82,10 +82,10 @@ function PageOverlayCanvas({
       width={width}
       height={height}
       render={renderBox}
-      onMouseDown={onDragStart}
-      onMouseMove={onDragUpdate}
-      onMouseUp={onDragEnd}
-      onMouseLeave={onDragEnd}
+      // onMouseDown={onDragStart}
+      // onMouseMove={onDragUpdate}
+      // onMouseUp={onDragEnd}
+      // onMouseLeave={onDragEnd}
     />
   );
 }

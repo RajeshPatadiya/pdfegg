@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import HighDpiCanvas from "../common/HighDpiCanvas";
 import useDebounce from "../common/hooks/useDebounce";
-import LayoutBuilder from "../common/LayoutBuilder";
 import Window from "../common/Window";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import { Page } from "./Page";
+import WindowOverlayCanvas from "./WindowOverlayCanvas";
 
 interface PdfViewerProps {
   pdfHandle: PdfHandle;
@@ -58,36 +57,25 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
       <section className="pdf-viewer__left-sidebar"></section>
 
       <section className="pdf-viewer__content">
-        <Window
-          onVisibleChanged={(start, end) =>
-            debounce(() => handleVisibleChanged(start, end))
-          }
-        >
-          {pages.map((pageHandle, i) => {
-            const pageNumber = i + 1;
-            return (
-              <Page
-                key={pageNumber}
-                pageNumber={pageNumber}
-                pageHandle={pageHandle}
-                defaultAspectRatio={defaultAspectRatio}
-              />
-            );
-          })}
-        </Window>
-
-        <LayoutBuilder
-          buildLayout={(width, height) => (
-            <HighDpiCanvas
-              width={width}
-              height={height}
-              className="content__overlay"
-              render={(context) => {
-                context.fillRect(100, 100, 100, 100);
-              }}
-            />
-          )}
-        />
+        <WindowOverlayCanvas>
+          <Window
+            onVisibleChanged={(start, end) =>
+              debounce(() => handleVisibleChanged(start, end))
+            }
+          >
+            {pages.map((pageHandle, i) => {
+              const pageNumber = i + 1;
+              return (
+                <Page
+                  key={pageNumber}
+                  pageNumber={pageNumber}
+                  pageHandle={pageHandle}
+                  defaultAspectRatio={defaultAspectRatio}
+                />
+              );
+            })}
+          </Window>
+        </WindowOverlayCanvas>
       </section>
 
       <section className="pdf-viewer__right-sidebar"></section>

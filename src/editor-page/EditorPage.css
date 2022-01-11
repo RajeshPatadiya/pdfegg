@@ -29,7 +29,6 @@
 .pdf-viewer__content {
   background-color: #f1f1f1;
   overflow: hidden;
-  position: relative;
 }
 
 .content__overlay {
@@ -41,7 +40,6 @@
 
 .page-container {
   position: relative;
-  cursor: crosshair;
   margin: 32px auto;
   background-color: #fff;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);

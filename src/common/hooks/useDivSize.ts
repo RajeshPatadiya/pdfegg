@@ -1,19 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-interface Props {
-  buildLayout: (width: number, height: number) => React.ReactElement;
-}
-
-function LayoutBuilder({ buildLayout }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
+function useDivSize(): [React.RefObject<HTMLDivElement>, number?, number?] {
+  const divRef = useRef<HTMLDivElement>(null);
 
   const [width, setWidth] = useState<number>();
   const [height, setHeight] = useState<number>();
 
   const updateSize = useCallback(() => {
-    if (containerRef.current === null) return;
+    if (divRef.current === null) return;
 
-    const { clientWidth, clientHeight } = containerRef.current;
+    const { clientWidth, clientHeight } = divRef.current;
 
     if (clientWidth !== width) {
       setWidth(clientWidth);
@@ -35,13 +31,7 @@ function LayoutBuilder({ buildLayout }: Props) {
     };
   });
 
-  return (
-    <div ref={containerRef} style={{ height: "100%", width: "100%" }}>
-      {width !== undefined &&
-        height !== undefined &&
-        buildLayout(width, height)}
-    </div>
-  );
+  return [divRef, width, height];
 }
 
-export default LayoutBuilder;
+export default useDivSize;
