@@ -11,6 +11,7 @@
   align-items: center;
   background-color: #3e3e3e;
   color: #fff;
+  overflow: hidden;
 }
 
 .pdf-viewer {
