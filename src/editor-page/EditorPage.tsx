@@ -28,7 +28,7 @@ function EditorPage() {
     <EditorStateProvider>
       <div className="editor-page">
         <Header>
-          <img src={logo} className="App-logo" alt="pdfegg" />
+          <img src={logo} className="logo" alt="pdfegg" />
 
           <Toolbar selectedTool={selectedTool} onChanged={setSelectedTool} />
 

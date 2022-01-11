@@ -6,9 +6,9 @@
 
 .header {
   height: 60px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
   align-items: center;
-  justify-content: space-between;
   background-color: #3e3e3e;
   color: #fff;
 }
