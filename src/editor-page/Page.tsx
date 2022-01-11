@@ -83,7 +83,12 @@ const RenderedPage = React.forwardRef<HTMLDivElement, RenderedPageProps>(
 
     return (
       <PageContainer ref={ref} width={width} height={height}>
-        <HighDpiCanvas width={width} height={height} render={renderPage} />
+        <HighDpiCanvas
+          width={width}
+          height={height}
+          render={renderPage}
+          preScaleRender={false}
+        />
         <PageOverlayCanvas
           width={width}
           height={height}

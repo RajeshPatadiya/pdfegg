@@ -82,6 +82,7 @@ function PageOverlayCanvas({
       width={width}
       height={height}
       render={renderBox}
+      preScaleRender={false}
       // onMouseDown={onDragStart}
       // onMouseMove={onDragUpdate}
       // onMouseUp={onDragEnd}
