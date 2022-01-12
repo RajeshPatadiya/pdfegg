@@ -25,7 +25,6 @@ function WindowOverlayCanvas({ children }: Props) {
   };
 
   const onDragUpdate: React.PointerEventHandler = (e) => {
-    console.log(getPointerCoords(e));
     dragDispatch({ type: "DRAG_UPDATE", coordinate: getPointerCoords(e) });
   };
 
