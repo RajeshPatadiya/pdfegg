@@ -34,7 +34,6 @@ function WindowOverlayCanvas({ children }: Props) {
 
   const renderSelectionBox = (context: CanvasRenderingContext2D) => {
     if (!dragState) return;
-    console.log("render selection");
 
     const { start, end } = dragState;
     const width = end.x - start.x;
