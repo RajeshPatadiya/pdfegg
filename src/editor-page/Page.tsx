@@ -8,10 +8,11 @@ interface PageProps {
   pageNumber: number;
   pageHandle: PdfPageHandle | null;
   defaultAspectRatio: number;
+  drawablePreview: Drawable;
 }
 
 export const Page = React.forwardRef<HTMLDivElement, PageProps>(
-  ({ pageNumber, pageHandle, defaultAspectRatio }, ref) => {
+  ({ pageNumber, pageHandle, defaultAspectRatio, drawablePreview }, ref) => {
     const pageDrawables = useDocumentPageDrawables(pageNumber);
 
     const defaultWidth = 800;
@@ -31,7 +32,7 @@ export const Page = React.forwardRef<HTMLDivElement, PageProps>(
         ref={ref}
         width={defaultWidth}
         pageHandle={pageHandle}
-        drawables={pageDrawables}
+        drawables={[...pageDrawables, drawablePreview]}
       />
     );
   }

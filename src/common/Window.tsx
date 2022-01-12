@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 interface WindowProps {
   children: React.ReactElement[];
+  itemsRef: React.MutableRefObject<HTMLElement[]>;
   onVisibleChanged: (
     visibleStartIndex: number,
     visibleEndIndex: number
@@ -13,13 +14,12 @@ interface VisibleRange {
   endIndex: number;
 }
 
-function Window({ children, onVisibleChanged }: WindowProps) {
+function Window({ children, itemsRef, onVisibleChanged }: WindowProps) {
   const [visibleRange, setVisibleRange] = useState<VisibleRange>({
     startIndex: 0,
     endIndex: 0,
   });
   const viewportRef = useRef<HTMLDivElement>(null);
-  const itemsRef = useRef<Array<HTMLElement>>([]);
 
   function updateVisibleRange(newVisibleRange: VisibleRange) {
     onVisibleChanged(newVisibleRange.startIndex, newVisibleRange.endIndex);
