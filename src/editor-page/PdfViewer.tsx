@@ -1,9 +1,8 @@
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useDebounce from "../common/hooks/useDebounce";
 import Window from "../common/Window";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import { Page } from "./Page";
-import WindowOverlayCanvas from "./WindowOverlayCanvas";
 
 interface PdfViewerProps {
   pdfHandle: PdfHandle;
@@ -31,8 +30,6 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
   const itemsRef = useRef<Array<HTMLElement>>([]);
 
-  const [dragState, dragDispatch] = useReducer(dragReducer, null);
-
   if (defaultAspectRatio === undefined) {
     return <p>Loading default aspect ratio</p>;
   }
@@ -56,107 +53,34 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
     setPages(newPages);
   }
 
-  const renderSelectionBox = (context: CanvasRenderingContext2D) => {
-    if (!dragState) return;
-
-    const { start, end } = dragState;
-    const width = end.x - start.x;
-    const height = end.y - start.y;
-
-    context.fillStyle = "rgba(255,138,0,0.2)";
-    context.strokeStyle = "rgba(255,138,0,0.8)";
-    context.beginPath();
-    context.rect(start.x, start.y, width, height);
-    context.fill();
-    context.stroke();
-    context.closePath();
-  };
-
   return (
     <section className="pdf-viewer">
       <section className="pdf-viewer__left-sidebar"></section>
 
       <section className="pdf-viewer__content">
-        <WindowOverlayCanvas
-          render={renderSelectionBox}
-          // TODO: Listen to window pointer events
-          onPointerDown={(coordinate) =>
-            dragDispatch({ type: "DRAG_START", coordinate })
+        <Window
+          itemsRef={itemsRef}
+          onVisibleChanged={(start, end) =>
+            debounce(() => handleVisibleChanged(start, end))
           }
-          onPointerMove={(coordinate) => {
-            if (!dragState) return;
-            dragDispatch({
-              type: "DRAG_UPDATE",
-              coordinate,
-            });
-          }}
-          onPointerUp={(_) => dragDispatch({ type: "DRAG_END" })}
         >
-          <Window
-            itemsRef={itemsRef}
-            onVisibleChanged={(start, end) =>
-              debounce(() => handleVisibleChanged(start, end))
-            }
-          >
-            {pages.map((pageHandle, i) => {
-              const pageNumber = i + 1;
-              return (
-                <Page
-                  key={pageNumber}
-                  pageNumber={pageNumber}
-                  pageHandle={pageHandle}
-                  defaultAspectRatio={defaultAspectRatio}
-                />
-              );
-            })}
-          </Window>
-        </WindowOverlayCanvas>
+          {pages.map((pageHandle, i) => {
+            const pageNumber = i + 1;
+            return (
+              <Page
+                key={pageNumber}
+                pageNumber={pageNumber}
+                pageHandle={pageHandle}
+                defaultAspectRatio={defaultAspectRatio}
+              />
+            );
+          })}
+        </Window>
       </section>
 
       <section className="pdf-viewer__right-sidebar"></section>
     </section>
   );
-}
-
-type Coordinate = {
-  x: number;
-  y: number;
-};
-
-type DragState = {
-  start: Coordinate;
-  end: Coordinate;
-} | null;
-
-interface DragStartAction {
-  type: "DRAG_START";
-  coordinate: Coordinate;
-}
-
-interface DragUpdateAction {
-  type: "DRAG_UPDATE";
-  coordinate: Coordinate;
-}
-
-interface DragEndAction {
-  type: "DRAG_END";
-}
-
-type DragAction = DragStartAction | DragUpdateAction | DragEndAction;
-
-function dragReducer(state: DragState, action: DragAction): DragState {
-  switch (action.type) {
-    case "DRAG_START":
-      return { start: action.coordinate, end: action.coordinate };
-    case "DRAG_UPDATE":
-      if (!state) return state;
-      return {
-        ...state,
-        end: action.coordinate,
-      };
-    case "DRAG_END":
-      return null;
-  }
 }
 
 export default PdfViewer;
