@@ -5,7 +5,6 @@ interface HighDpiCanvasProps {
   height: number;
   render: (canvasContext: CanvasRenderingContext2D) => void;
   preScaleRender?: boolean;
-  className?: string;
   onMouseDown?: MouseEventHandler<HTMLCanvasElement>;
   onMouseMove?: MouseEventHandler<HTMLCanvasElement>;
   onMouseUp?: MouseEventHandler<HTMLCanvasElement>;

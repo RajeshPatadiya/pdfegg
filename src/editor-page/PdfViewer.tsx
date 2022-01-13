@@ -53,6 +53,9 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
     setPages(newPages);
   }
 
+  // TODO: Preserve heights of unloaded pages
+  // TODO: Selection box is a positioned div within Window
+
   return (
     <section className="pdf-viewer">
       <section className="pdf-viewer__left-sidebar"></section>
