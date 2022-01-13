@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from "react";
+import { Box, boxIntersection } from "../common/Box";
 import useDebounce from "../common/hooks/useDebounce";
 import Window from "../common/Window";
 import RectDrawable from "../pdf-modification/drawables/RectDrawable";
@@ -33,6 +34,10 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
   const itemsRef = useRef<Array<HTMLElement>>([]);
 
   const [dragState, dragDispatch] = useReducer(dragReducer, null);
+
+  const [visibleIndices, setVisibleIndices] = useState<number[]>([]);
+
+  const contentRef = useRef<HTMLElement>(null);
 
   if (defaultAspectRatio === undefined) {
     return <p>Loading default aspect ratio</p>;
@@ -77,25 +82,56 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
     <section className="pdf-viewer">
       <section className="pdf-viewer__left-sidebar"></section>
 
-      <section className="pdf-viewer__content">
+      <section className="pdf-viewer__content" ref={contentRef}>
         <WindowOverlayCanvas
           render={renderSelectionBox}
+          // TODO: Listen to window pointer events
           onPointerDown={(coordinate) =>
             dragDispatch({ type: "DRAG_START", coordinate })
           }
-          onPointerMove={(coordinate) =>
+          onPointerMove={(coordinate) => {
+            if (!dragState) return;
             dragDispatch({
               type: "DRAG_UPDATE",
               coordinate,
-            })
-          }
+            });
+            const [start, end] = visibleIndices;
+
+            const { x, y } = dragState.start;
+            const selectionBox: Box = {
+              x,
+              y,
+              width: coordinate.x - x,
+              height: coordinate.y - y,
+            };
+
+            const contentRect = contentRef.current!.getBoundingClientRect();
+
+            for (let i = start; i <= end; i++) {
+              const page = itemsRef.current[i];
+              const pageRect = page.getBoundingClientRect();
+
+              const pageBox: Box = {
+                x: pageRect.left - contentRect.left,
+                y: pageRect.top - contentRect.top,
+                width: pageRect.width,
+                height: pageRect.height,
+              };
+
+              // console.log(boxIntersection(pageBox, selectionBox));
+
+              // convert overlaps to page coordinates
+              // convert page coordinates to pdf coodinates and make RectDrawables
+            }
+          }}
           onPointerUp={(coordinate) => dragDispatch({ type: "DRAG_END" })}
         >
           <Window
             itemsRef={itemsRef}
-            onVisibleChanged={(start, end) =>
-              debounce(() => handleVisibleChanged(start, end))
-            }
+            onVisibleChanged={(start, end) => {
+              setVisibleIndices([start, end]);
+              debounce(() => handleVisibleChanged(start, end));
+            }}
           >
             {pages.map((pageHandle, i) => {
               const pageNumber = i + 1;

@@ -1,6 +1,6 @@
 import { PDFPage } from "pdf-lib";
+import { Box } from "../../common/Box";
 import Drawable from "./Drawable";
-import { Box } from "./types";
 import { hexToPdfColor } from "./utils";
 
 class RectDrawable extends Drawable {
