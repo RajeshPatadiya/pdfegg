@@ -56,6 +56,8 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
   // TODO: Preserve heights of unloaded pages
   // TODO: Selection box is a positioned div within Window
 
+  const pageWidth = 800;
+
   return (
     <section className="pdf-viewer">
       <section className="pdf-viewer__left-sidebar"></section>
@@ -74,6 +76,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
                 key={pageNumber}
                 pageNumber={pageNumber}
                 pageHandle={pageHandle}
+                width={pageWidth}
                 defaultAspectRatio={defaultAspectRatio}
               />
             );
