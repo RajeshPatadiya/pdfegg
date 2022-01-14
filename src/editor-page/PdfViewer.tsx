@@ -8,52 +8,57 @@ interface PdfViewerProps {
   pdfHandle: PdfHandle;
 }
 
-type PagesState = Array<PdfPageHandle | null>;
+type PageHandlesArray = Array<PdfPageHandle | null>;
 
 function PdfViewer({ pdfHandle }: PdfViewerProps) {
-  const [firstPageAspectRatio, setFirstPageAspectRatio] = useState<number>();
-
-  const [pages, setPages] = useState<PagesState>(
-    Array(pdfHandle.pageCount).fill(null)
-  );
+  const [pageHandles, setPageHandles] = useState<PageHandlesArray>([]);
+  const pageAspectRatiosRef = useRef<number[]>([]);
 
   useEffect(() => {
-    async function loadDefaultAspectRatio() {
+    async function initState() {
+      const handles = Array(pdfHandle.pageCount).fill(null);
       const firstPage = await pdfHandle.getPage(1);
-      setFirstPageAspectRatio(firstPage.aspectRatio);
+
+      handles[0] = firstPage;
+      setPageHandles(handles);
+
+      pageAspectRatiosRef.current = [firstPage.aspectRatio];
     }
 
-    loadDefaultAspectRatio();
+    initState();
   }, [pdfHandle]);
 
   const debounce = useDebounce(150);
 
-  const itemsRef = useRef<Array<HTMLElement>>([]);
+  // For later retrieving of page positions in Window.
+  const itemsRef = useRef<HTMLElement[]>([]);
 
-  if (firstPageAspectRatio === undefined) {
+  if (pageHandles.length === 0) {
     return null;
   }
 
   async function handleVisibleChanged(startIndex: number, endIndex: number) {
-    const newPages: PagesState = Array(pages.length).fill(null);
+    const newLoadedPages: PageHandlesArray = Array(pageHandles.length).fill(
+      null
+    );
 
     // Preload at least one invisible page on top and bottom.
     const start = Math.max(0, startIndex - 1);
-    const end = Math.min(pages.length - 1, endIndex + 1);
+    const end = Math.min(pageHandles.length - 1, endIndex + 1);
 
     for (let i = start; i <= end; i++) {
-      newPages[i] = pages[i] || (await pdfHandle.getPage(i + 1));
+      newLoadedPages[i] = pageHandles[i] || (await pdfHandle.getPage(i + 1));
+      pageAspectRatiosRef.current[i] = newLoadedPages[i]!.aspectRatio;
     }
 
     // Unload from memory removed pages.
-    pages
-      .filter((handle, i) => handle !== null && newPages[i] === null)
+    pageHandles
+      .filter((handle, i) => handle !== null && newLoadedPages[i] === null)
       .forEach((handle) => handle?.releaseResources());
 
-    setPages(newPages);
+    setPageHandles(newLoadedPages);
   }
 
-  // TODO: Preserve heights of unloaded pages
   // TODO: Selection box is a positioned div within Window
 
   const pageWidth = 800;
@@ -69,7 +74,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
             debounce(() => handleVisibleChanged(start, end))
           }
         >
-          {pages.map((pageHandle, i) => {
+          {pageHandles.map((pageHandle, i) => {
             const pageNumber = i + 1;
             return (
               <Page
@@ -77,7 +82,10 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
                 pageNumber={pageNumber}
                 pageHandle={pageHandle}
                 width={pageWidth}
-                fallbackAspectRatio={firstPageAspectRatio}
+                fallbackAspectRatio={
+                  pageAspectRatiosRef.current[i] ||
+                  pageAspectRatiosRef.current[0]
+                }
               />
             );
           })}
