@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box } from "../common/Box";
 import useDebounce from "../common/hooks/useDebounce";
 import Window from "../common/Window";
@@ -39,6 +39,39 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
   const [selectionBox, setSelectionBox] = useState<Box>();
 
   const selectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onPointerMove = (e: PointerEvent) => {
+      if (!windowRef.current) return;
+      if (!selectionBox) return;
+
+      const w = windowRef.current;
+
+      const { x, y } = selectionBox;
+
+      const contentX = e.clientX - w.offsetLeft;
+      const contentY = e.clientY - w.offsetTop + w.scrollTop;
+
+      const top = Math.min(contentY, y);
+      const left = Math.min(contentX, x);
+
+      const width = Math.abs(contentX - x);
+      const height = Math.abs(contentY - y);
+
+      const style = selectionRef.current!.style;
+
+      style.top = `${top}px`;
+      style.left = `${left}px`;
+      style.width = `${width}px`;
+      style.height = `${height}px`;
+    };
+
+    window.addEventListener("pointermove", onPointerMove);
+
+    return () => {
+      window.removeEventListener("pointermove", onPointerMove);
+    };
+  }, [selectionBox]);
 
   if (pageHandles.length === 0) {
     return null;
@@ -90,31 +123,6 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
             height: 0,
           });
         }}
-        onPointerMove={(e) => {
-          e.preventDefault();
-          if (!windowRef.current) return;
-          if (!selectionBox) return;
-
-          const w = windowRef.current;
-
-          const { x, y } = selectionBox;
-
-          const contentX = e.clientX - w.offsetLeft;
-          const contentY = e.clientY - w.offsetTop + w.scrollTop;
-
-          const top = Math.min(contentY, y);
-          const left = Math.min(contentX, x);
-
-          const width = Math.abs(contentX - x);
-          const height = Math.abs(contentY - y);
-
-          const style = selectionRef.current!.style;
-
-          style.top = `${top}px`;
-          style.left = `${left}px`;
-          style.width = `${width}px`;
-          style.height = `${height}px`;
-        }}
         onPointerUp={(e) => setSelectionBox(undefined)}
       >
         <Window
@@ -133,8 +141,6 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
                       position: "absolute",
                       top: selectionBox.y,
                       left: selectionBox.x,
-                      width: selectionBox.width,
-                      height: selectionBox.height,
                     }}
                   />,
                 ]
