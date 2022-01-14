@@ -1,7 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface WindowProps {
   children: React.ReactElement[];
+  afterChildren: React.ReactElement[];
+  windowRef: React.RefObject<HTMLDivElement>;
   itemsRef: React.MutableRefObject<HTMLElement[]>;
   onVisibleChanged: (
     visibleStartIndex: number,
@@ -14,12 +16,17 @@ interface VisibleRange {
   endIndex: number;
 }
 
-function Window({ children, itemsRef, onVisibleChanged }: WindowProps) {
+function Window({
+  children,
+  afterChildren,
+  windowRef,
+  itemsRef,
+  onVisibleChanged,
+}: WindowProps) {
   const [visibleRange, setVisibleRange] = useState<VisibleRange>({
     startIndex: 0,
     endIndex: 0,
   });
-  const viewportRef = useRef<HTMLDivElement>(null);
 
   function updateVisibleRange(newVisibleRange: VisibleRange) {
     onVisibleChanged(newVisibleRange.startIndex, newVisibleRange.endIndex);
@@ -28,7 +35,7 @@ function Window({ children, itemsRef, onVisibleChanged }: WindowProps) {
 
   useEffect(() => {
     const initialVisibleRange = getVisibleItemRange(
-      viewportRef.current!,
+      windowRef.current!,
       itemsRef.current,
       visibleRange
     );
@@ -37,8 +44,8 @@ function Window({ children, itemsRef, onVisibleChanged }: WindowProps) {
 
   return (
     <div
-      ref={viewportRef}
-      style={{ height: "100%", overflow: "scroll" }}
+      ref={windowRef}
+      style={{ height: "100%", overflow: "scroll", position: "relative" }}
       onScroll={(e) => {
         console.assert(itemsRef.current.length === children.length);
 
@@ -61,6 +68,7 @@ function Window({ children, itemsRef, onVisibleChanged }: WindowProps) {
           ref: (el: HTMLElement) => (itemsRef.current[i] = el),
         })
       )}
+      {afterChildren}
     </div>
   );
 }

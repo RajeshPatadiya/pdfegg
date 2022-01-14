@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Box } from "../common/Box";
 import useDebounce from "../common/hooks/useDebounce";
 import Window from "../common/Window";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
@@ -30,8 +31,12 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
   const debounce = useDebounce(150);
 
+  const windowRef = useRef<HTMLDivElement>(null);
+
   // For later retrieving of page positions in Window.
   const itemsRef = useRef<HTMLElement[]>([]);
+
+  const [selectionBox, setSelectionBox] = useState<Box>();
 
   if (pageHandles.length === 0) {
     return null;
@@ -59,19 +64,72 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
     setPageHandles(newLoadedPages);
   }
 
-  // TODO: Selection box is a positioned div within Window
-
   const pageWidth = 800;
 
   return (
     <section className="pdf-viewer">
       <section className="pdf-viewer__left-sidebar"></section>
 
-      <section className="pdf-viewer__content">
+      <section
+        className="pdf-viewer__content"
+        onPointerDown={(e) => {
+          if (!windowRef.current) return;
+
+          const w = windowRef.current;
+
+          const contentX = e.clientX - w.offsetLeft;
+          const contentY = e.clientY - w.offsetTop + w.scrollTop;
+
+          setSelectionBox({
+            x: contentX,
+            y: contentY,
+            width: 0,
+            height: 0,
+          });
+        }}
+        onPointerMove={(e) => {
+          if (!windowRef.current) return;
+          if (!selectionBox) return;
+
+          const w = windowRef.current;
+
+          const { x, y } = selectionBox;
+
+          const contentX = e.clientX - w.offsetLeft;
+          const contentY = e.clientY - w.offsetTop + w.scrollTop;
+
+          console.log(contentX, contentY);
+
+          setSelectionBox({
+            x,
+            y,
+            width: contentX - x,
+            height: contentY - y,
+          });
+        }}
+        onPointerUp={(e) => setSelectionBox(undefined)}
+      >
         <Window
+          windowRef={windowRef}
           itemsRef={itemsRef}
           onVisibleChanged={(start, end) =>
             debounce(() => handleVisibleChanged(start, end))
+          }
+          afterChildren={
+            selectionBox
+              ? [
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: selectionBox.y,
+                      left: selectionBox.x,
+                      width: selectionBox.width,
+                      height: selectionBox.height,
+                      backgroundColor: "red",
+                    }}
+                  />,
+                ]
+              : []
           }
         >
           {pageHandles.map((pageHandle, i) => {
