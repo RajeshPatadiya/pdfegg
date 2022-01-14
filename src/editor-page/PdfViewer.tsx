@@ -102,14 +102,18 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
           const contentX = e.clientX - w.offsetLeft;
           const contentY = e.clientY - w.offsetTop + w.scrollTop;
 
-          // setSelectionBox({
-          //   x,
-          //   y,
-          //   width: contentX - x,
-          //   height: contentY - y,
-          // });
-          selectionRef.current!.style.width = `${contentX - x}px`;
-          selectionRef.current!.style.height = `${contentY - y}px`;
+          const top = Math.min(contentY, y);
+          const left = Math.min(contentX, x);
+
+          const width = Math.abs(contentX - x);
+          const height = Math.abs(contentY - y);
+
+          const style = selectionRef.current!.style;
+
+          style.top = `${top}px`;
+          style.left = `${left}px`;
+          style.width = `${width}px`;
+          style.height = `${height}px`;
         }}
         onPointerUp={(e) => setSelectionBox(undefined)}
       >
