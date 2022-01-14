@@ -75,6 +75,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
       <section
         className="pdf-viewer__content"
         onPointerDown={(e) => {
+          e.preventDefault();
           if (!windowRef.current) return;
 
           const w = windowRef.current;
@@ -90,6 +91,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
           });
         }}
         onPointerMove={(e) => {
+          e.preventDefault();
           if (!windowRef.current) return;
           if (!selectionBox) return;
 
@@ -122,13 +124,13 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
               ? [
                   <div
                     ref={selectionRef}
+                    className="selection-box"
                     style={{
                       position: "absolute",
                       top: selectionBox.y,
                       left: selectionBox.x,
                       width: selectionBox.width,
                       height: selectionBox.height,
-                      backgroundColor: "red",
                     }}
                   />,
                 ]
