@@ -38,6 +38,8 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
   const [selectionBox, setSelectionBox] = useState<Box>();
 
+  const selectionRef = useRef<HTMLDivElement>(null);
+
   if (pageHandles.length === 0) {
     return null;
   }
@@ -98,14 +100,14 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
           const contentX = e.clientX - w.offsetLeft;
           const contentY = e.clientY - w.offsetTop + w.scrollTop;
 
-          console.log(contentX, contentY);
-
-          setSelectionBox({
-            x,
-            y,
-            width: contentX - x,
-            height: contentY - y,
-          });
+          // setSelectionBox({
+          //   x,
+          //   y,
+          //   width: contentX - x,
+          //   height: contentY - y,
+          // });
+          selectionRef.current!.style.width = `${contentX - x}px`;
+          selectionRef.current!.style.height = `${contentY - y}px`;
         }}
         onPointerUp={(e) => setSelectionBox(undefined)}
       >
@@ -119,6 +121,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
             selectionBox
               ? [
                   <div
+                    ref={selectionRef}
                     style={{
                       position: "absolute",
                       top: selectionBox.y,
