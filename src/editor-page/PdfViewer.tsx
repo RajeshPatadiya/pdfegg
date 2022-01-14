@@ -11,7 +11,7 @@ interface PdfViewerProps {
 type PagesState = Array<PdfPageHandle | null>;
 
 function PdfViewer({ pdfHandle }: PdfViewerProps) {
-  const [defaultAspectRatio, setDefaultAspectRatio] = useState<number>();
+  const [firstPageAspectRatio, setFirstPageAspectRatio] = useState<number>();
 
   const [pages, setPages] = useState<PagesState>(
     Array(pdfHandle.pageCount).fill(null)
@@ -20,7 +20,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
   useEffect(() => {
     async function loadDefaultAspectRatio() {
       const firstPage = await pdfHandle.getPage(1);
-      setDefaultAspectRatio(firstPage.aspectRatio);
+      setFirstPageAspectRatio(firstPage.aspectRatio);
     }
 
     loadDefaultAspectRatio();
@@ -30,8 +30,8 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
   const itemsRef = useRef<Array<HTMLElement>>([]);
 
-  if (defaultAspectRatio === undefined) {
-    return <p>Loading default aspect ratio</p>;
+  if (firstPageAspectRatio === undefined) {
+    return null;
   }
 
   async function handleVisibleChanged(startIndex: number, endIndex: number) {
@@ -77,7 +77,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
                 pageNumber={pageNumber}
                 pageHandle={pageHandle}
                 width={pageWidth}
-                defaultAspectRatio={defaultAspectRatio}
+                fallbackAspectRatio={firstPageAspectRatio}
               />
             );
           })}
