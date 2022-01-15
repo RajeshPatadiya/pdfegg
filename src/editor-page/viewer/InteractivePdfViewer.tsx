@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Box } from "../../common/Box";
 import { clamp } from "../../common/math";
 import { PdfHandle } from "../../pdf-rendering";
 import PdfViewer from "./PdfViewer";
@@ -8,23 +7,28 @@ interface Props {
   pdfHandle: PdfHandle;
 }
 
+interface Coord {
+  x: number;
+  y: number;
+}
+
 function InteractivePdfViewer({ pdfHandle }: Props) {
   const viewerRef = useRef<HTMLDivElement>(null);
   const pagesRef = useRef<HTMLElement[]>([]);
 
-  const [selectionBox, setSelectionBox] = useState<Box | null>(null);
+  const [contentTouchdown, setContentTouchdown] = useState<Coord | null>(null);
   const selectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!selectionBox) return;
+    if (!contentTouchdown) return;
 
     const onPointerMove = (e: PointerEvent) => {
       if (!viewerRef.current) return;
-      if (!selectionBox) return;
+      if (!contentTouchdown) return;
 
       const v = viewerRef.current;
 
-      const { x, y } = selectionBox;
+      const { x, y } = contentTouchdown;
 
       const viewerX = clamp(e.clientX - v.offsetLeft, 0, v.clientWidth);
       const viewerY = clamp(e.clientY - v.offsetTop, 0, v.clientHeight);
@@ -46,7 +50,7 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
       style.height = `${height}px`;
     };
 
-    const onPointerUp = (e: PointerEvent) => setSelectionBox(null);
+    const onPointerUp = (_: PointerEvent) => setContentTouchdown(null);
 
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
@@ -55,7 +59,7 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
     };
-  }, [selectionBox]);
+  }, [contentTouchdown]);
 
   return (
     <div
@@ -69,11 +73,9 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
         const contentX = e.clientX - v.offsetLeft;
         const contentY = e.clientY - v.offsetTop + v.scrollTop;
 
-        setSelectionBox({
+        setContentTouchdown({
           x: contentX,
           y: contentY,
-          width: 0,
-          height: 0,
         });
       }}
     >
@@ -82,15 +84,15 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
         viewerRef={viewerRef}
         pagesRef={pagesRef}
         afterChildren={
-          selectionBox
+          contentTouchdown
             ? [
                 <div
                   ref={selectionRef}
                   className="selection-box"
                   style={{
                     position: "absolute",
-                    top: selectionBox.y,
-                    left: selectionBox.x,
+                    top: contentTouchdown.y,
+                    left: contentTouchdown.x,
                   }}
                 />,
               ]
