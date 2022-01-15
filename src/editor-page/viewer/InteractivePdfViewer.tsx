@@ -12,10 +12,12 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
   const viewerRef = useRef<HTMLDivElement>(null);
   const pagesRef = useRef<HTMLElement[]>([]);
 
-  const [selectionBox, setSelectionBox] = useState<Box>();
+  const [selectionBox, setSelectionBox] = useState<Box | null>(null);
   const selectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!selectionBox) return;
+
     const onPointerMove = (e: PointerEvent) => {
       if (!viewerRef.current) return;
       if (!selectionBox) return;
@@ -44,7 +46,7 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
       style.height = `${height}px`;
     };
 
-    const onPointerUp = (e: PointerEvent) => setSelectionBox(undefined);
+    const onPointerUp = (e: PointerEvent) => setSelectionBox(null);
 
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
