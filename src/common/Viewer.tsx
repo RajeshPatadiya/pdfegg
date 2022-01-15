@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-interface WindowProps {
+interface Props {
   children: React.ReactElement[];
   afterChildren: React.ReactElement[];
-  windowRef: React.RefObject<HTMLDivElement>;
+  viewerRef: React.RefObject<HTMLDivElement>;
   itemsRef: React.MutableRefObject<HTMLElement[]>;
   onVisibleChanged: (
     visibleStartIndex: number,
@@ -16,13 +16,13 @@ interface VisibleRange {
   endIndex: number;
 }
 
-function Window({
+function Viewer({
   children,
   afterChildren,
-  windowRef,
+  viewerRef,
   itemsRef,
   onVisibleChanged,
-}: WindowProps) {
+}: Props) {
   const [visibleRange, setVisibleRange] = useState<VisibleRange>({
     startIndex: 0,
     endIndex: 0,
@@ -35,7 +35,7 @@ function Window({
 
   useEffect(() => {
     const initialVisibleRange = getVisibleItemRange(
-      windowRef.current!,
+      viewerRef.current!,
       itemsRef.current,
       visibleRange
     );
@@ -44,7 +44,7 @@ function Window({
 
   return (
     <div
-      ref={windowRef}
+      ref={viewerRef}
       style={{ height: "100%", overflow: "scroll", position: "relative" }}
       onScroll={(e) => {
         console.assert(itemsRef.current.length === children.length);
@@ -74,18 +74,18 @@ function Window({
 }
 
 function getVisibleItemRange(
-  viewport: HTMLElement,
+  viewer: HTMLElement,
   items: HTMLElement[],
   prevVisibleRange: VisibleRange
 ): VisibleRange {
-  const viewportTop = viewport.scrollTop;
-  const viewportBottom = viewportTop + viewport.clientHeight;
+  const viewportTop = viewer.scrollTop;
+  const viewportBottom = viewportTop + viewer.clientHeight;
 
   function getItemPosition(item: HTMLElement): {
     top: number;
     bottom: number;
   } {
-    const top = item.offsetTop - viewport.offsetTop;
+    const top = item.offsetTop - viewer.offsetTop;
     const bottom = top + item.clientHeight;
     return { top, bottom };
   }
@@ -139,4 +139,4 @@ function getVisibleItemRange(
   };
 }
 
-export default Window;
+export default Viewer;

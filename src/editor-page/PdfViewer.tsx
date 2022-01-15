@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Box } from "../common/Box";
 import useDebounce from "../common/hooks/useDebounce";
 import { clamp } from "../common/math";
-import Window from "../common/Window";
+import Viewer from "../common/Viewer";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import { Page } from "./Page";
 
@@ -32,9 +32,9 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
   const debounce = useDebounce(150);
 
-  const windowRef = useRef<HTMLDivElement>(null);
+  const viewerRef = useRef<HTMLDivElement>(null);
 
-  // For later retrieving of page positions in Window.
+  // For later retrieving of page positions in Viewer.
   const itemsRef = useRef<HTMLElement[]>([]);
 
   const [selectionBox, setSelectionBox] = useState<Box>();
@@ -43,18 +43,18 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
   useEffect(() => {
     const onPointerMove = (e: PointerEvent) => {
-      if (!windowRef.current) return;
+      if (!viewerRef.current) return;
       if (!selectionBox) return;
 
-      const w = windowRef.current;
+      const v = viewerRef.current;
 
       const { x, y } = selectionBox;
 
-      const viewerX = clamp(e.clientX - w.offsetLeft, 0, w.clientWidth);
-      const viewerY = clamp(e.clientY - w.offsetTop, 0, w.clientHeight);
+      const viewerX = clamp(e.clientX - v.offsetLeft, 0, v.clientWidth);
+      const viewerY = clamp(e.clientY - v.offsetTop, 0, v.clientHeight);
 
       const contentX = viewerX;
-      const contentY = viewerY + w.scrollTop;
+      const contentY = viewerY + v.scrollTop;
 
       const top = Math.min(contentY, y);
       const left = Math.min(contentX, x);
@@ -114,12 +114,12 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
       style={{ height: "100%" }}
       onPointerDown={(e) => {
         e.preventDefault();
-        if (!windowRef.current) return;
+        if (!viewerRef.current) return;
 
-        const w = windowRef.current;
+        const v = viewerRef.current;
 
-        const contentX = e.clientX - w.offsetLeft;
-        const contentY = e.clientY - w.offsetTop + w.scrollTop;
+        const contentX = e.clientX - v.offsetLeft;
+        const contentY = e.clientY - v.offsetTop + v.scrollTop;
 
         setSelectionBox({
           x: contentX,
@@ -129,8 +129,8 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
         });
       }}
     >
-      <Window
-        windowRef={windowRef}
+      <Viewer
+        viewerRef={viewerRef}
         itemsRef={itemsRef}
         onVisibleChanged={(start, end) =>
           debounce(() => handleVisibleChanged(start, end))
@@ -165,7 +165,7 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
             />
           );
         })}
-      </Window>
+      </Viewer>
     </div>
   );
 }
