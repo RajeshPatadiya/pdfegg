@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Box } from "../common/Box";
 import useDebounce from "../common/hooks/useDebounce";
 import { clamp } from "../common/math";
@@ -110,70 +110,63 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
   const pageWidth = 800;
 
   return (
-    <section className="pdf-viewer">
-      <section className="pdf-viewer__left-sidebar"></section>
+    <div
+      style={{ height: "100%" }}
+      onPointerDown={(e) => {
+        e.preventDefault();
+        if (!windowRef.current) return;
 
-      <section
-        className="pdf-viewer__content"
-        onPointerDown={(e) => {
-          e.preventDefault();
-          if (!windowRef.current) return;
+        const w = windowRef.current;
 
-          const w = windowRef.current;
+        const contentX = e.clientX - w.offsetLeft;
+        const contentY = e.clientY - w.offsetTop + w.scrollTop;
 
-          const contentX = e.clientX - w.offsetLeft;
-          const contentY = e.clientY - w.offsetTop + w.scrollTop;
-
-          setSelectionBox({
-            x: contentX,
-            y: contentY,
-            width: 0,
-            height: 0,
-          });
-        }}
+        setSelectionBox({
+          x: contentX,
+          y: contentY,
+          width: 0,
+          height: 0,
+        });
+      }}
+    >
+      <Window
+        windowRef={windowRef}
+        itemsRef={itemsRef}
+        onVisibleChanged={(start, end) =>
+          debounce(() => handleVisibleChanged(start, end))
+        }
+        afterChildren={
+          selectionBox
+            ? [
+                <div
+                  ref={selectionRef}
+                  className="selection-box"
+                  style={{
+                    position: "absolute",
+                    top: selectionBox.y,
+                    left: selectionBox.x,
+                  }}
+                />,
+              ]
+            : []
+        }
       >
-        <Window
-          windowRef={windowRef}
-          itemsRef={itemsRef}
-          onVisibleChanged={(start, end) =>
-            debounce(() => handleVisibleChanged(start, end))
-          }
-          afterChildren={
-            selectionBox
-              ? [
-                  <div
-                    ref={selectionRef}
-                    className="selection-box"
-                    style={{
-                      position: "absolute",
-                      top: selectionBox.y,
-                      left: selectionBox.x,
-                    }}
-                  />,
-                ]
-              : []
-          }
-        >
-          {pageHandles.map((pageHandle, i) => {
-            const pageNumber = i + 1;
-            return (
-              <Page
-                key={pageNumber}
-                pageNumber={pageNumber}
-                pageHandle={pageHandle}
-                width={pageWidth}
-                fallbackAspectRatio={
-                  pageAspectRatiosRef.current[i] ||
-                  pageAspectRatiosRef.current[0]
-                }
-              />
-            );
-          })}
-        </Window>
-      </section>
-
-      <section className="pdf-viewer__right-sidebar"></section>
-    </section>
+        {pageHandles.map((pageHandle, i) => {
+          const pageNumber = i + 1;
+          return (
+            <Page
+              key={pageNumber}
+              pageNumber={pageNumber}
+              pageHandle={pageHandle}
+              width={pageWidth}
+              fallbackAspectRatio={
+                pageAspectRatiosRef.current[i] || pageAspectRatiosRef.current[0]
+              }
+            />
+          );
+        })}
+      </Window>
+    </div>
   );
 }
 
