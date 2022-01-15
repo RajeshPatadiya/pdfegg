@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Box } from "../common/Box";
 import useDebounce from "../common/hooks/useDebounce";
+import { clamp } from "../common/math";
 import Window from "../common/Window";
 import { PdfHandle, PdfPageHandle } from "../pdf-rendering";
 import { Page } from "./Page";
@@ -49,11 +50,11 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
       const { x, y } = selectionBox;
 
-      // TODO: Clip content coord to content plane
-      // TODO: Handle pointer up outside of window
+      const viewerX = clamp(e.clientX - w.offsetLeft, 0, w.clientWidth);
+      const viewerY = clamp(e.clientY - w.offsetTop, 0, w.clientHeight);
 
-      const contentX = e.clientX - w.offsetLeft;
-      const contentY = e.clientY - w.offsetTop + w.scrollTop;
+      const contentX = viewerX;
+      const contentY = viewerY + w.scrollTop;
 
       const top = Math.min(contentY, y);
       const left = Math.min(contentX, x);
