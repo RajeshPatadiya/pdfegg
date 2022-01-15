@@ -43,16 +43,16 @@ function EditorPage() {
           </div>
         </Header>
 
-        <section className="pdf-viewer">
-          <section className="pdf-viewer__left-sidebar"></section>
+        <section className="editor-body">
+          <section className="left-sidebar"></section>
 
-          <section className="pdf-viewer__content">
+          <section className="content">
             {pdfHandle && (
               <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />
             )}
           </section>
 
-          <section className="pdf-viewer__right-sidebar"></section>
+          <section className="right-sidebar"></section>
         </section>
       </div>
     </EditorStateProvider>

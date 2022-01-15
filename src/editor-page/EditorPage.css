@@ -14,19 +14,19 @@
   overflow: hidden;
 }
 
-.pdf-viewer {
+.editor-body {
   display: grid;
   grid-template-columns: 200px 1fr 200px;
   overflow: hidden;
 }
 
-.pdf-viewer__left-sidebar,
-.pdf-viewer__right-sidebar {
+.left-sidebar,
+.right-sidebar {
   overflow-y: scroll;
   background-color: #fff;
 }
 
-.pdf-viewer__content {
+.content {
   background-color: #f1f1f1;
   overflow: hidden;
 }
