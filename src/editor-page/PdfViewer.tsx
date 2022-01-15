@@ -49,6 +49,9 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
 
       const { x, y } = selectionBox;
 
+      // TODO: Clip content coord to content plane
+      // TODO: Handle pointer up outside of window
+
       const contentX = e.clientX - w.offsetLeft;
       const contentY = e.clientY - w.offsetTop + w.scrollTop;
 
@@ -66,10 +69,14 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
       style.height = `${height}px`;
     };
 
+    const onPointerUp = (e: PointerEvent) => setSelectionBox(undefined);
+
     window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
 
     return () => {
       window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
     };
   }, [selectionBox]);
 
@@ -123,7 +130,6 @@ function PdfViewer({ pdfHandle }: PdfViewerProps) {
             height: 0,
           });
         }}
-        onPointerUp={(e) => setSelectionBox(undefined)}
       >
         <Window
           windowRef={windowRef}
