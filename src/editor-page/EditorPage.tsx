@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { PdfHandle } from "../pdf-rendering";
 import DownloadButton from "./DownloadButton";
-import PdfViewer from "./PdfViewer";
 
 import logo from "./logo.svg";
 import "./EditorPage.css";
 import Header from "./Header";
 import EditorStateProvider from "./EditorStateProvider";
 import Toolbar, { Tool } from "./Toolbar";
+import InteractivePdfViewer from "./viewer/InteractivePdfViewer";
 
 function EditorPage() {
   const [pdfHandle, setPdfHandle] = useState<PdfHandle | null>(null);
@@ -48,7 +48,7 @@ function EditorPage() {
 
           <section className="content">
             {pdfHandle && (
-              <PdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />
+              <InteractivePdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />
             )}
           </section>
 
