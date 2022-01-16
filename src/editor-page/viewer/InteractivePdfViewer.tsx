@@ -23,8 +23,9 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
     if (!contentTouchdown) return;
 
     const onPointerMove = (e: PointerEvent) => {
-      if (!viewerRef.current) return;
-      if (!contentTouchdown) return;
+      if (!contentTouchdown || !viewerRef.current || !selectionRef.current) {
+        return;
+      }
 
       const v = viewerRef.current;
 
@@ -42,7 +43,7 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
       const width = Math.abs(contentX - x);
       const height = Math.abs(contentY - y);
 
-      const style = selectionRef.current!.style;
+      const style = selectionRef.current.style;
 
       style.top = `${top}px`;
       style.left = `${left}px`;
