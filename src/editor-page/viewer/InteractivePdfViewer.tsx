@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Box, boxIntersection } from "../../common/Box";
+import { bottom, Box, boxIntersection } from "../../common/Box";
 import { clamp } from "../../common/math";
 import { PdfHandle } from "../../pdf-rendering";
 import { Tool } from "../Toolbar";
@@ -33,6 +33,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
 
   const [contentTouchdown, setContentTouchdown] = useState<Coord | null>(null);
   const selectionRef = useRef<HTMLDivElement>(null);
+  const touchdownPageIndexRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!contentTouchdown) return;
@@ -76,7 +77,14 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
       // TODO: Create and pass RectDrawables to pages
     };
 
-    const onPointerUp = (_: PointerEvent) => setContentTouchdown(null);
+    const onPointerUp = (_: PointerEvent) => {
+      // TODO: Use touchdown page to determine the affected page range
+      // start = min(touchdownPageIndex, visibleStart)
+      // end = max(touchdownPageIndex, visibleEnd)
+
+      touchdownPageIndexRef.current = null;
+      setContentTouchdown(null);
+    };
 
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
@@ -96,6 +104,22 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
       y: e.clientY,
     };
     const contentCoord = clientToContentCoord(clientCoord, viewerRef.current);
+
+    // Store touchdown page (might become invisible on scroll)
+    const { startIndex, endIndex } = visibleRangeRef.current;
+
+    let touchdownPageIndex = endIndex;
+
+    for (let i = startIndex; i <= endIndex; i++) {
+      const page = pagesRef.current[i];
+      const pageContentBox = getPageContentBox(page);
+      if (bottom(pageContentBox) > contentCoord.y) {
+        touchdownPageIndex = i;
+        break;
+      }
+    }
+
+    touchdownPageIndexRef.current = touchdownPageIndex;
 
     setContentTouchdown(contentCoord);
   }, []);

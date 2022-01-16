@@ -5,11 +5,11 @@ export type Box = {
   height: number;
 };
 
-function right(box: Box): number {
+export function right(box: Box): number {
   return box.x + box.width;
 }
 
-function bottom(box: Box): number {
+export function bottom(box: Box): number {
   return box.y + box.height;
 }
 
