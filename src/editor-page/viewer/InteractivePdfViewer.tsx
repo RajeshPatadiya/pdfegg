@@ -27,12 +27,11 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
         return;
       }
 
-      const viewer = viewerRef.current;
       const clientCoord: Coord = {
         x: e.clientX,
         y: e.clientY,
       };
-      const contentCoord = clientToContentCoord(clientCoord, viewer);
+      const contentCoord = clientToContentCoord(clientCoord, viewerRef.current);
 
       const top = Math.min(contentCoord.y, contentTouchdown.y);
       const left = Math.min(contentCoord.x, contentTouchdown.x);
@@ -66,12 +65,14 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
         e.preventDefault();
         if (!viewerRef.current) return;
 
-        const viewer = viewerRef.current;
         const clientCoord: Coord = {
           x: e.clientX,
           y: e.clientY,
         };
-        const contentCoord = clientToContentCoord(clientCoord, viewer);
+        const contentCoord = clientToContentCoord(
+          clientCoord,
+          viewerRef.current
+        );
 
         setContentTouchdown(contentCoord);
       }}
