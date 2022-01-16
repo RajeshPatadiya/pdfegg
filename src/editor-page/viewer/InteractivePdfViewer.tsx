@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  PointerEventHandler,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Box } from "../../common/Box";
 import { clamp } from "../../common/math";
 import { PdfHandle } from "../../pdf-rendering";
@@ -53,25 +59,21 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
     };
   }, [contentTouchdown]);
 
+  const onPointerDown: PointerEventHandler = useCallback((e) => {
+    e.preventDefault();
+    if (!viewerRef.current) return;
+
+    const clientCoord: Coord = {
+      x: e.clientX,
+      y: e.clientY,
+    };
+    const contentCoord = clientToContentCoord(clientCoord, viewerRef.current);
+
+    setContentTouchdown(contentCoord);
+  }, []);
+
   return (
-    <div
-      style={{ height: "100%" }}
-      onPointerDown={(e) => {
-        e.preventDefault();
-        if (!viewerRef.current) return;
-
-        const clientCoord: Coord = {
-          x: e.clientX,
-          y: e.clientY,
-        };
-        const contentCoord = clientToContentCoord(
-          clientCoord,
-          viewerRef.current
-        );
-
-        setContentTouchdown(contentCoord);
-      }}
-    >
+    <div style={{ height: "100%" }} onPointerDown={onPointerDown}>
       <PdfViewer
         pdfHandle={pdfHandle}
         viewerRef={viewerRef}
@@ -80,8 +82,9 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
           contentTouchdown
             ? [
                 <div
-                  ref={selectionRef}
+                  key="selection-box"
                   className="selection-box"
+                  ref={selectionRef}
                   style={{
                     position: "absolute",
                     top: contentTouchdown.y,
