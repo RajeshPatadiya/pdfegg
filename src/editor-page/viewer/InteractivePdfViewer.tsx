@@ -49,6 +49,11 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
       style.left = `${contentBox.x}px`;
       style.width = `${contentBox.width}px`;
       style.height = `${contentBox.height}px`;
+
+      // TODO: Log page numbers that overlap with `contentBox`
+      // TODO: Calc box overlap for each page
+      // TODO: Convert box overlap to pdf coords
+      // TODO: Create and pass RectDrawables to pages
     };
 
     const onPointerUp = (_: PointerEvent) => setContentTouchdown(null);
