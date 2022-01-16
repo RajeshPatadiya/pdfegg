@@ -6,11 +6,12 @@ import {
   useRef,
   useState,
 } from "react";
-import { Box } from "../../common/Box";
+import { Box, boxIntersection } from "../../common/Box";
 import { clamp } from "../../common/math";
 import { PdfHandle } from "../../pdf-rendering";
 import { Tool } from "../Toolbar";
 import PdfViewer from "./PdfViewer";
+import { VisibleRange } from "./Viewer";
 
 interface Props {
   pdfHandle: PdfHandle;
@@ -23,6 +24,10 @@ interface Coord {
 }
 
 function InteractivePdfViewer({ pdfHandle, tool }: Props) {
+  const visibleRangeRef = useRef<VisibleRange>({
+    startIndex: 0,
+    endIndex: 0,
+  });
   const viewerRef = useRef<HTMLDivElement>(null);
   const pagesRef = useRef<HTMLElement[]>([]);
 
@@ -37,18 +42,33 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
         return;
       }
 
-      const clientCoord: Coord = {
+      const pointerClientCoord: Coord = {
         x: e.clientX,
         y: e.clientY,
       };
-      const contentCoord = clientToContentCoord(clientCoord, viewerRef.current);
-      const contentBox = boxFromTwoPoints(contentTouchdown, contentCoord);
+      const pointerContentCoord = clientToContentCoord(
+        pointerClientCoord,
+        viewerRef.current
+      );
+      const selectionContentBox = boxFromTwoPoints(
+        contentTouchdown,
+        pointerContentCoord
+      );
 
       const style = selectionRef.current.style;
-      style.top = `${contentBox.y}px`;
-      style.left = `${contentBox.x}px`;
-      style.width = `${contentBox.width}px`;
-      style.height = `${contentBox.height}px`;
+      style.top = `${selectionContentBox.y}px`;
+      style.left = `${selectionContentBox.x}px`;
+      style.width = `${selectionContentBox.width}px`;
+      style.height = `${selectionContentBox.height}px`;
+
+      const { startIndex, endIndex } = visibleRangeRef.current;
+
+      const pageContentBox = getPageContentBox(pagesRef.current[startIndex]);
+      const intersection = boxIntersection(pageContentBox, selectionContentBox);
+
+      if (intersection) {
+        console.log("hit!");
+      }
 
       // TODO: Log page numbers that overlap with `contentBox`
       // TODO: Calc box overlap for each page
@@ -84,8 +104,9 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
     <div style={{ height: "100%" }} onPointerDown={onPointerDown}>
       <PdfViewer
         pdfHandle={pdfHandle}
+        visibleRangeRef={visibleRangeRef}
         viewerRef={viewerRef}
-        pagesRef={pagesRef}
+        itemsRef={pagesRef}
         afterChildren={
           contentTouchdown
             ? [
@@ -140,6 +161,15 @@ function boxFromTwoPoints(a: Coord, b: Coord): Box {
     y: Math.min(a.y, b.y),
     width: Math.abs(a.x - b.x),
     height: Math.abs(a.y - b.y),
+  };
+}
+
+function getPageContentBox(page: HTMLElement): Box {
+  return {
+    x: page.offsetLeft,
+    y: page.offsetTop,
+    width: page.clientWidth,
+    height: page.clientHeight,
   };
 }
 

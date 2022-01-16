@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 
 interface Props {
   children: React.ReactElement[];
   afterChildren: React.ReactElement[];
+  visibleRangeRef: React.MutableRefObject<VisibleRange>;
   viewerRef: React.RefObject<HTMLDivElement>;
   itemsRef: React.MutableRefObject<HTMLElement[]>;
   onVisibleChanged: (
@@ -11,7 +12,7 @@ interface Props {
   ) => void;
 }
 
-interface VisibleRange {
+export interface VisibleRange {
   startIndex: number;
   endIndex: number;
 }
@@ -19,15 +20,11 @@ interface VisibleRange {
 function Viewer({
   children,
   afterChildren,
+  visibleRangeRef,
   viewerRef,
   itemsRef,
   onVisibleChanged,
 }: Props) {
-  const visibleRangeRef = useRef<VisibleRange>({
-    startIndex: 0,
-    endIndex: 0,
-  });
-
   function updateVisibleRange(newVisibleRange: VisibleRange) {
     visibleRangeRef.current = newVisibleRange;
     onVisibleChanged(newVisibleRange.startIndex, newVisibleRange.endIndex);

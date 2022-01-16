@@ -2,23 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import useDebounce from "../../common/hooks/useDebounce";
 import { PdfHandle, PdfPageHandle } from "../../pdf-rendering";
 import { Page } from "./../Page";
-import Viewer from "./Viewer";
+import Viewer, { VisibleRange } from "./Viewer";
 
 interface PdfViewerProps {
   pdfHandle: PdfHandle;
   afterChildren: React.ReactElement[];
+  visibleRangeRef: React.MutableRefObject<VisibleRange>;
   viewerRef: React.RefObject<HTMLDivElement>;
-  pagesRef: React.MutableRefObject<HTMLElement[]>;
+  itemsRef: React.MutableRefObject<HTMLElement[]>;
 }
 
 type PageHandlesArray = Array<PdfPageHandle | null>;
 
-function PdfViewer({
-  pdfHandle,
-  afterChildren,
-  viewerRef,
-  pagesRef,
-}: PdfViewerProps) {
+function PdfViewer({ pdfHandle, ...otherProps }: PdfViewerProps) {
   const [pageHandles, setPageHandles] = useState<PageHandlesArray>([]);
   const pageAspectRatiosRef = useRef<number[]>([]);
   const debounce = useDebounce(150);
@@ -67,12 +63,10 @@ function PdfViewer({
 
   return (
     <Viewer
-      viewerRef={viewerRef}
-      itemsRef={pagesRef}
       onVisibleChanged={(start, end) =>
         debounce(() => handleVisibleChanged(start, end))
       }
-      afterChildren={afterChildren}
+      {...otherProps}
     >
       {pageHandles.map((pageHandle, i) => {
         const pageNumber = i + 1;
