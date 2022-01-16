@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import {
   PointerEventHandler,
   useCallback,
@@ -8,10 +9,12 @@ import {
 import { Box } from "../../common/Box";
 import { clamp } from "../../common/math";
 import { PdfHandle } from "../../pdf-rendering";
+import { Tool } from "../Toolbar";
 import PdfViewer from "./PdfViewer";
 
 interface Props {
   pdfHandle: PdfHandle;
+  tool: Tool;
 }
 
 interface Coord {
@@ -19,7 +22,7 @@ interface Coord {
   y: number;
 }
 
-function InteractivePdfViewer({ pdfHandle }: Props) {
+function InteractivePdfViewer({ pdfHandle, tool }: Props) {
   const viewerRef = useRef<HTMLDivElement>(null);
   const pagesRef = useRef<HTMLElement[]>([]);
 
@@ -83,7 +86,9 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
             ? [
                 <div
                   key="selection-box"
-                  className="selection-box"
+                  className={classNames("selection-box", {
+                    "selection-fill": tool === "move",
+                  })}
                   ref={selectionRef}
                   style={{
                     position: "absolute",

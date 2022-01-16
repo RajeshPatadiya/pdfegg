@@ -48,7 +48,11 @@ function EditorPage() {
 
           <section className="content">
             {pdfHandle && (
-              <InteractivePdfViewer key={pdfHandle.id} pdfHandle={pdfHandle} />
+              <InteractivePdfViewer
+                key={pdfHandle.id}
+                pdfHandle={pdfHandle}
+                tool={selectedTool}
+              />
             )}
           </section>
 
