@@ -27,21 +27,18 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
         return;
       }
 
-      const v = viewerRef.current;
+      const viewer = viewerRef.current;
+      const clientCoord: Coord = {
+        x: e.clientX,
+        y: e.clientY,
+      };
+      const contentCoord = clientToContentCoord(clientCoord, viewer);
 
-      const { x, y } = contentTouchdown;
+      const top = Math.min(contentCoord.y, contentTouchdown.y);
+      const left = Math.min(contentCoord.x, contentTouchdown.x);
 
-      const viewerX = clamp(e.clientX - v.offsetLeft, 0, v.clientWidth);
-      const viewerY = clamp(e.clientY - v.offsetTop, 0, v.clientHeight);
-
-      const contentX = viewerX;
-      const contentY = viewerY + v.scrollTop;
-
-      const top = Math.min(contentY, y);
-      const left = Math.min(contentX, x);
-
-      const width = Math.abs(contentX - x);
-      const height = Math.abs(contentY - y);
+      const width = Math.abs(contentCoord.x - contentTouchdown.x);
+      const height = Math.abs(contentCoord.y - contentTouchdown.y);
 
       const style = selectionRef.current.style;
 
@@ -69,15 +66,14 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
         e.preventDefault();
         if (!viewerRef.current) return;
 
-        const v = viewerRef.current;
+        const viewer = viewerRef.current;
+        const clientCoord: Coord = {
+          x: e.clientX,
+          y: e.clientY,
+        };
+        const contentCoord = clientToContentCoord(clientCoord, viewer);
 
-        const contentX = e.clientX - v.offsetLeft;
-        const contentY = e.clientY - v.offsetTop + v.scrollTop;
-
-        setContentTouchdown({
-          x: contentX,
-          y: contentY,
-        });
+        setContentTouchdown(contentCoord);
       }}
     >
       <PdfViewer
@@ -102,6 +98,31 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
       />
     </div>
   );
+}
+
+function clientToViewerCoord(
+  clientCoord: Coord,
+  viewer: HTMLDivElement
+): Coord {
+  return {
+    x: clamp(clientCoord.x - viewer.offsetLeft, 0, viewer.clientWidth),
+    y: clamp(clientCoord.y - viewer.offsetTop, 0, viewer.clientHeight),
+  };
+}
+
+function clientToContentCoord(
+  clientCoord: Coord,
+  viewer: HTMLDivElement
+): Coord {
+  const viewerCoord = clientToViewerCoord(clientCoord, viewer);
+  return viewerToContentCoord(viewerCoord, viewer);
+}
+
+function viewerToContentCoord(viewerCoord: Coord, viewer: HTMLDivElement) {
+  return {
+    x: viewerCoord.x,
+    y: viewerCoord.y + viewer.scrollTop,
+  };
 }
 
 export default InteractivePdfViewer;
