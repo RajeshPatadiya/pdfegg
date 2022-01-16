@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Box } from "../../common/Box";
 import { clamp } from "../../common/math";
 import { PdfHandle } from "../../pdf-rendering";
 import PdfViewer from "./PdfViewer";
@@ -32,19 +33,13 @@ function InteractivePdfViewer({ pdfHandle }: Props) {
         y: e.clientY,
       };
       const contentCoord = clientToContentCoord(clientCoord, viewerRef.current);
-
-      const top = Math.min(contentCoord.y, contentTouchdown.y);
-      const left = Math.min(contentCoord.x, contentTouchdown.x);
-
-      const width = Math.abs(contentCoord.x - contentTouchdown.x);
-      const height = Math.abs(contentCoord.y - contentTouchdown.y);
+      const contentBox = boxFromTwoPoints(contentTouchdown, contentCoord);
 
       const style = selectionRef.current.style;
-
-      style.top = `${top}px`;
-      style.left = `${left}px`;
-      style.width = `${width}px`;
-      style.height = `${height}px`;
+      style.top = `${contentBox.y}px`;
+      style.left = `${contentBox.x}px`;
+      style.width = `${contentBox.width}px`;
+      style.height = `${contentBox.height}px`;
     };
 
     const onPointerUp = (_: PointerEvent) => setContentTouchdown(null);
@@ -123,6 +118,15 @@ function viewerToContentCoord(viewerCoord: Coord, viewer: HTMLDivElement) {
   return {
     x: viewerCoord.x,
     y: viewerCoord.y + viewer.scrollTop,
+  };
+}
+
+function boxFromTwoPoints(a: Coord, b: Coord): Box {
+  return {
+    x: Math.min(a.x, b.x),
+    y: Math.min(a.y, b.y),
+    width: Math.abs(a.x - b.x),
+    height: Math.abs(a.y - b.y),
   };
 }
 
