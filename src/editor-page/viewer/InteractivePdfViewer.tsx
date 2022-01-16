@@ -64,14 +64,23 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
 
       const { startIndex, endIndex } = visibleRangeRef.current;
 
-      const pageContentBox = getPageContentBox(pagesRef.current[startIndex]);
-      const intersection = boxIntersection(pageContentBox, selectionContentBox);
+      const indices: number[] = [];
 
-      if (intersection) {
-        console.log("hit!");
+      for (let i = startIndex; i <= endIndex; i++) {
+        const page = pagesRef.current[i];
+        const pageContentBox = getPageContentBox(page);
+        const intersection = boxIntersection(
+          pageContentBox,
+          selectionContentBox
+        );
+
+        if (intersection) {
+          indices.push(i);
+        }
       }
 
-      // TODO: Log page numbers that overlap with `contentBox`
+      console.log(indices);
+
       // TODO: Calc box overlap for each page
       // TODO: Convert box overlap to pdf coords
       // TODO: Create and pass RectDrawables to pages
