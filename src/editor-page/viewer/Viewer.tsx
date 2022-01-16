@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
 interface Props {
   children: React.ReactElement[];
@@ -23,21 +23,21 @@ function Viewer({
   itemsRef,
   onVisibleChanged,
 }: Props) {
-  const [visibleRange, setVisibleRange] = useState<VisibleRange>({
+  const visibleRangeRef = useRef<VisibleRange>({
     startIndex: 0,
     endIndex: 0,
   });
 
   function updateVisibleRange(newVisibleRange: VisibleRange) {
+    visibleRangeRef.current = newVisibleRange;
     onVisibleChanged(newVisibleRange.startIndex, newVisibleRange.endIndex);
-    setVisibleRange(newVisibleRange);
   }
 
   useEffect(() => {
     const initialVisibleRange = getVisibleItemRange(
       viewerRef.current!,
       itemsRef.current,
-      visibleRange
+      visibleRangeRef.current
     );
     updateVisibleRange(initialVisibleRange);
   }, []);
@@ -49,6 +49,7 @@ function Viewer({
       onScroll={(e) => {
         console.assert(itemsRef.current.length === children.length);
 
+        const visibleRange = visibleRangeRef.current;
         const newVisibleRange = getVisibleItemRange(
           e.currentTarget,
           itemsRef.current,
