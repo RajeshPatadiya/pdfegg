@@ -5,12 +5,22 @@ export type Box = {
   height: number;
 };
 
-export function right(box: Box): number {
+export function boxRight(box: Box): number {
   return box.x + box.width;
 }
 
-export function bottom(box: Box): number {
+export function boxBottom(box: Box): number {
   return box.y + box.height;
+}
+
+// Scales the box's coordinate system.
+export function boxScaleCoord(box: Box, scalar: number): Box {
+  return {
+    x: box.x * scalar,
+    y: box.y * scalar,
+    width: box.width * scalar,
+    height: box.height * scalar,
+  };
 }
 
 export function boxIntersection(boxA: Box, boxB: Box): Box | null {
@@ -20,8 +30,8 @@ export function boxIntersection(boxA: Box, boxB: Box): Box | null {
   const x = Math.max(boxA.x, boxB.x);
   const y = Math.max(boxA.y, boxB.y);
 
-  const intersectionRight = Math.min(right(boxA), right(boxB));
-  const intersectionBottom = Math.min(bottom(boxA), bottom(boxB));
+  const intersectionRight = Math.min(boxRight(boxA), boxRight(boxB));
+  const intersectionBottom = Math.min(boxBottom(boxA), boxBottom(boxB));
 
   const width = intersectionRight - x;
   const height = intersectionBottom - y;

@@ -6,7 +6,12 @@ import {
   useRef,
   useState,
 } from "react";
-import { bottom, Box, boxIntersection } from "../../common/Box";
+import {
+  boxBottom,
+  Box,
+  boxIntersection,
+  boxScaleCoord,
+} from "../../common/Box";
 import { clamp } from "../../common/math";
 import { PdfHandle } from "../../pdf-rendering";
 import { Tool } from "../Toolbar";
@@ -81,7 +86,6 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
 
       console.log(indices);
 
-      // TODO: Calc box overlap for each page
       // TODO: Convert box overlap to pdf coords
       // TODO: Create and pass RectDrawables to pages
     };
@@ -122,7 +126,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
     for (let i = startIndex; i <= endIndex; i++) {
       const page = pagesRef.current[i];
       const pageContentBox = getPageContentBox(page);
-      if (bottom(pageContentBox) > contentCoord.y) {
+      if (boxBottom(pageContentBox) > contentCoord.y) {
         touchdownPageIndex = i;
         break;
       }
@@ -204,6 +208,21 @@ function getPageContentBox(page: HTMLElement): Box {
     width: page.clientWidth,
     height: page.clientHeight,
   };
+}
+
+function contentToPdfBox(
+  contentBox: Box,
+  pageContentBox: Box,
+  pdfPageWidth: number
+): Box {
+  const pdfCoordScalar = pdfPageWidth / pageContentBox.width;
+  const relativeBox = {
+    x: contentBox.x - pageContentBox.x,
+    y: contentBox.y - pageContentBox.y,
+    width: contentBox.width,
+    height: contentBox.height,
+  };
+  return boxScaleCoord(relativeBox, pdfCoordScalar);
 }
 
 export default InteractivePdfViewer;
