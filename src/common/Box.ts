@@ -1,9 +1,14 @@
-export type Box = {
+export interface Coord {
   x: number;
   y: number;
+}
+
+export interface Size {
   width: number;
   height: number;
-};
+}
+
+export type Box = Coord & Size;
 
 export function boxRight(box: Box): number {
   return box.x + box.width;

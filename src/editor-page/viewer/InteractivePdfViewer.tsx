@@ -7,8 +7,9 @@ import {
   useState,
 } from "react";
 import {
-  boxBottom,
+  Coord,
   Box,
+  boxBottom,
   boxIntersection,
   boxScaleCoord,
 } from "../../common/Box";
@@ -21,11 +22,6 @@ import { VisibleRange } from "./Viewer";
 interface Props {
   pdfHandle: PdfHandle;
   tool: Tool;
-}
-
-interface Coord {
-  x: number;
-  y: number;
 }
 
 function InteractivePdfViewer({ pdfHandle, tool }: Props) {
@@ -78,6 +74,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
           pageContentBox,
           selectionContentBox
         );
+        // contentToPdfBox(intersection, pageContentBox);
 
         if (intersection) {
           indices.push(i);
