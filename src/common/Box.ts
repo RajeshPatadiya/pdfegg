@@ -1,12 +1,4 @@
-export interface Coord {
-  x: number;
-  y: number;
-}
-
-export interface Size {
-  width: number;
-  height: number;
-}
+import { Coord, Size } from "./Measure";
 
 export type Box = Coord & Size;
 

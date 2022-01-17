@@ -73,7 +73,7 @@ const RenderedPage = React.forwardRef<HTMLDivElement, RenderedPageProps>(
     const renderDrawables = useCallback(
       (context) => {
         drawables.forEach((drawable) =>
-          drawable.drawOnCanvas(context, pageHandle.width)
+          drawable.drawOnCanvas(context, pageHandle.size.width)
         );
       },
       [drawables, pageHandle]

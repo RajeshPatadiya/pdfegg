@@ -7,13 +7,13 @@ import {
   useState,
 } from "react";
 import {
-  Coord,
   Box,
   boxBottom,
   boxIntersection,
   boxScaleCoord,
 } from "../../common/Box";
 import { clamp } from "../../common/math";
+import { Coord } from "../../common/Measure";
 import { PdfHandle } from "../../pdf-rendering";
 import { Tool } from "../Toolbar";
 import PdfViewer from "./PdfViewer";
