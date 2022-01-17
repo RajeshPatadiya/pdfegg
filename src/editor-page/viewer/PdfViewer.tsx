@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import useDebounce from "../../common/hooks/useDebounce";
+import { Size, sizeAspectRatio } from "../../common/Measure";
 import { PdfHandle, PdfPageHandle } from "../../pdf-rendering";
 import { Page } from "./../Page";
 import Viewer, { VisibleRange } from "./Viewer";
@@ -16,18 +17,21 @@ type PageHandlesArray = Array<PdfPageHandle | null>;
 
 function PdfViewer({ pdfHandle, ...otherProps }: PdfViewerProps) {
   const [pageHandles, setPageHandles] = useState<PageHandlesArray>([]);
-  const pageAspectRatiosRef = useRef<number[]>([]);
+  const pageSizesRef = useRef<Array<Size | null>>([]);
   const debounce = useDebounce(150);
 
   useEffect(() => {
     async function initState() {
+      const sizes = Array(pdfHandle.pageCount).fill(null);
       const handles = Array(pdfHandle.pageCount).fill(null);
+
       const firstPage = await pdfHandle.getPage(1);
 
+      sizes[0] = firstPage.size;
       handles[0] = firstPage;
-      setPageHandles(handles);
 
-      pageAspectRatiosRef.current = [firstPage.aspectRatio];
+      pageSizesRef.current = sizes;
+      setPageHandles(handles);
     }
 
     initState();
@@ -48,7 +52,7 @@ function PdfViewer({ pdfHandle, ...otherProps }: PdfViewerProps) {
 
     for (let i = start; i <= end; i++) {
       newLoadedPages[i] = pageHandles[i] || (await pdfHandle.getPage(i + 1));
-      pageAspectRatiosRef.current[i] = newLoadedPages[i]!.aspectRatio;
+      pageSizesRef.current[i] = newLoadedPages[i]!.size;
     }
 
     // Unload from memory removed pages.
@@ -59,7 +63,9 @@ function PdfViewer({ pdfHandle, ...otherProps }: PdfViewerProps) {
     setPageHandles(newLoadedPages);
   }
 
-  const pageWidth = 800;
+  const width = 800;
+  const sizes = pageSizesRef.current;
+  const firstPageAspectRatio = sizeAspectRatio(sizes[0]!);
 
   return (
     <Viewer
@@ -70,14 +76,15 @@ function PdfViewer({ pdfHandle, ...otherProps }: PdfViewerProps) {
     >
       {pageHandles.map((pageHandle, i) => {
         const pageNumber = i + 1;
+        const pageSize = sizes[i];
         return (
           <Page
             key={pageNumber}
             pageNumber={pageNumber}
             pageHandle={pageHandle}
-            width={pageWidth}
+            width={width}
             fallbackAspectRatio={
-              pageAspectRatiosRef.current[i] || pageAspectRatiosRef.current[0]
+              pageSize ? sizeAspectRatio(pageSize) : firstPageAspectRatio
             }
           />
         );
