@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import useDebounce from "../../common/hooks/useDebounce";
 import { Size, sizeAspectRatio } from "../../common/Measure";
 import Drawable from "../../pdf-modification/drawables/Drawable";
@@ -13,6 +13,7 @@ export type DrawablesMap = {
 interface PdfViewerProps {
   pdfHandle: PdfHandle;
   afterChildren: React.ReactElement[];
+  pageSizesRef: React.MutableRefObject<(Size | null)[]>;
   visibleRangeRef: React.MutableRefObject<VisibleRange>;
   viewerRef: React.RefObject<HTMLDivElement>;
   itemsRef: React.MutableRefObject<HTMLElement[]>;
@@ -23,11 +24,12 @@ type PageHandlesArray = Array<PdfPageHandle | null>;
 
 function PdfViewer({
   pdfHandle,
+  pageSizesRef,
   previewDrawables,
   ...otherProps
 }: PdfViewerProps) {
   const [pageHandles, setPageHandles] = useState<PageHandlesArray>([]);
-  const pageSizesRef = useRef<Array<Size | null>>([]);
+
   const debounce = useDebounce(150);
 
   useEffect(() => {

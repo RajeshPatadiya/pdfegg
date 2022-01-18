@@ -13,7 +13,7 @@ import {
   boxScaleCoord,
 } from "../../common/Box";
 import { clamp } from "../../common/math";
-import { Coord } from "../../common/Measure";
+import { Coord, Size } from "../../common/Measure";
 import RectDrawable from "../../pdf-modification/drawables/RectDrawable";
 import { PdfHandle } from "../../pdf-rendering";
 import { Tool } from "../Toolbar";
@@ -32,6 +32,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
   });
   const viewerRef = useRef<HTMLDivElement>(null);
   const pagesRef = useRef<HTMLElement[]>([]);
+  const pageSizesRef = useRef<Array<Size | null>>([]);
 
   const [contentTouchdown, setContentTouchdown] = useState<Coord | null>(null);
   const [selectionBox, setSelectionBox] = useState<Box | null>(null);
@@ -63,6 +64,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
       const { startIndex, endIndex } = visibleRangeRef.current;
 
       const drawables: DrawablesMap = {};
+      const sizes = pageSizesRef.current;
 
       for (let i = startIndex; i <= endIndex; i++) {
         const page = pagesRef.current[i];
@@ -73,7 +75,11 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
         );
 
         if (intersection) {
-          const pdfBox = contentToPdfBox(intersection, pageContentBox, 387.6);
+          const pdfBox = contentToPdfBox(
+            intersection,
+            pageContentBox,
+            sizes[i]!.width
+          );
           drawables[i + 1] = new RectDrawable(pdfBox, "#cccccc");
         }
       }
@@ -135,6 +141,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
     <div style={{ height: "100%" }} onPointerDown={onPointerDown}>
       <PdfViewer
         pdfHandle={pdfHandle}
+        pageSizesRef={pageSizesRef}
         visibleRangeRef={visibleRangeRef}
         viewerRef={viewerRef}
         itemsRef={pagesRef}
