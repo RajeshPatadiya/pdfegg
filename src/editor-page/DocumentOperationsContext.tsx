@@ -51,12 +51,19 @@ type DocumentOperationsState = {
   };
 };
 type DocumentOperationsDispatch = React.Dispatch<DocumentOperationsAction>;
-type DocumentOperationsAction = UpdatePageDrawables;
+type DocumentOperationsAction = UpdatePageDrawables | AddDrawables;
 
 interface UpdatePageDrawables {
   type: "UPDATE_PAGE_DRAWABLES";
   pageNumber: number;
-  updatedOperations: Drawable[];
+  updatedDrawables: Drawable[];
+}
+
+interface AddDrawables {
+  type: "ADD_DRAWABLES";
+  drawableForPage: {
+    [pageNumber: number]: Drawable;
+  };
 }
 
 const initialState: DocumentOperationsState = {
@@ -73,8 +80,24 @@ function reducer(
         ...state,
         drawablesOnPage: {
           ...state.drawablesOnPage,
-          [action.pageNumber]: action.updatedOperations,
+          [action.pageNumber]: action.updatedDrawables,
         },
+      };
+    }
+    case "ADD_DRAWABLES": {
+      const drawablesOnPage = {
+        ...state.drawablesOnPage,
+      };
+      for (const [key, addedDrawable] of Object.entries(
+        action.drawableForPage
+      )) {
+        const pageNum = Number(key);
+        const prevDrawables = drawablesOnPage[pageNum] || [];
+        drawablesOnPage[pageNum] = [...prevDrawables, addedDrawable];
+      }
+      return {
+        ...state,
+        drawablesOnPage,
       };
     }
   }

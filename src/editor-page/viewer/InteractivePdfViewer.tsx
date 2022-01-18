@@ -16,6 +16,7 @@ import { clamp } from "../../common/math";
 import { Coord, Size } from "../../common/Measure";
 import RectDrawable from "../../pdf-modification/drawables/RectDrawable";
 import { PdfHandle } from "../../pdf-rendering";
+import { useDocumentOperationsDispatch } from "../DocumentOperationsContext";
 import { Tool } from "../Toolbar";
 import PdfViewer, { DrawablesMap } from "./PdfViewer";
 import { VisibleRange } from "./Viewer";
@@ -39,6 +40,8 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
   const touchdownPageIndexRef = useRef<number | null>(null);
 
   const [previewDrawables, setPreviewDrawables] = useState<DrawablesMap>({});
+
+  const dispatch = useDocumentOperationsDispatch();
 
   useEffect(() => {
     if (!contentTouchdown) return;
@@ -94,9 +97,15 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
       // end = max(touchdownPageIndex, visibleEnd)
 
       touchdownPageIndexRef.current = null;
+
       setContentTouchdown(null);
-      // setSelectionBox(null);
-      // setPreviewDrawables({});
+      setSelectionBox(null);
+      setPreviewDrawables({});
+
+      dispatch({
+        type: "ADD_DRAWABLES",
+        drawableForPage: previewDrawables,
+      });
     };
 
     window.addEventListener("pointermove", onPointerMove);
@@ -106,7 +115,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
     };
-  }, [contentTouchdown]);
+  }, [contentTouchdown, previewDrawables]);
 
   const onPointerDown: PointerEventHandler = useCallback((e) => {
     e.preventDefault();
