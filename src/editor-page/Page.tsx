@@ -20,8 +20,6 @@ export const Page = React.memo(
     ) => {
       const pageDrawables = useDocumentPageDrawables(pageNumber);
 
-      console.log("render");
-
       if (pageHandle === null) {
         return (
           <PageContainer

@@ -34,7 +34,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
   const pagesRef = useRef<HTMLElement[]>([]);
 
   const [contentTouchdown, setContentTouchdown] = useState<Coord | null>(null);
-  const selectionRef = useRef<HTMLDivElement>(null);
+  const [selectionBox, setSelectionBox] = useState<Box | null>(null);
   const touchdownPageIndexRef = useRef<number | null>(null);
 
   const [previewDrawables, setPreviewDrawables] = useState<DrawablesMap>({});
@@ -43,7 +43,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
     if (!contentTouchdown) return;
 
     const onPointerMove = (e: PointerEvent) => {
-      if (!contentTouchdown || !viewerRef.current || !selectionRef.current) {
+      if (!contentTouchdown || !viewerRef.current) {
         return;
       }
 
@@ -60,15 +60,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
         pointerContentCoord
       );
 
-      const style = selectionRef.current.style;
-      style.top = `${selectionContentBox.y}px`;
-      style.left = `${selectionContentBox.x}px`;
-      style.width = `${selectionContentBox.width}px`;
-      style.height = `${selectionContentBox.height}px`;
-
       const { startIndex, endIndex } = visibleRangeRef.current;
-
-      const indices: number[] = [];
 
       const drawables: DrawablesMap = {};
 
@@ -81,18 +73,13 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
         );
 
         if (intersection) {
-          indices.push(i);
           const pdfBox = contentToPdfBox(intersection, pageContentBox, 387.6);
-          drawables[i + 1] = new RectDrawable(pdfBox);
+          drawables[i + 1] = new RectDrawable(pdfBox, "#cccccc");
         }
       }
 
       setPreviewDrawables(drawables);
-
-      // console.log(indices);
-
-      // TODO: Convert box overlap to pdf coords
-      // TODO: Create and pass RectDrawables to pages
+      setSelectionBox(selectionContentBox);
     };
 
     const onPointerUp = (_: PointerEvent) => {
@@ -102,6 +89,8 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
 
       touchdownPageIndexRef.current = null;
       setContentTouchdown(null);
+      // setSelectionBox(null);
+      // setPreviewDrawables({});
     };
 
     window.addEventListener("pointermove", onPointerMove);
@@ -150,18 +139,19 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
         viewerRef={viewerRef}
         itemsRef={pagesRef}
         afterChildren={
-          contentTouchdown
+          selectionBox
             ? [
                 <div
                   key="selection-box"
                   className={classNames("selection-box", {
                     "selection-fill": tool === "move",
                   })}
-                  ref={selectionRef}
                   style={{
                     position: "absolute",
-                    top: contentTouchdown.y,
-                    left: contentTouchdown.x,
+                    top: selectionBox.y,
+                    left: selectionBox.x,
+                    width: selectionBox.width,
+                    height: selectionBox.height,
                   }}
                 />,
               ]
