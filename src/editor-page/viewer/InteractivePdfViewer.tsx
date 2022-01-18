@@ -14,9 +14,10 @@ import {
 } from "../../common/Box";
 import { clamp } from "../../common/math";
 import { Coord } from "../../common/Measure";
+import RectDrawable from "../../pdf-modification/drawables/RectDrawable";
 import { PdfHandle } from "../../pdf-rendering";
 import { Tool } from "../Toolbar";
-import PdfViewer from "./PdfViewer";
+import PdfViewer, { DrawablesMap } from "./PdfViewer";
 import { VisibleRange } from "./Viewer";
 
 interface Props {
@@ -35,6 +36,8 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
   const [contentTouchdown, setContentTouchdown] = useState<Coord | null>(null);
   const selectionRef = useRef<HTMLDivElement>(null);
   const touchdownPageIndexRef = useRef<number | null>(null);
+
+  const [previewDrawables, setPreviewDrawables] = useState<DrawablesMap>({});
 
   useEffect(() => {
     if (!contentTouchdown) return;
@@ -67,6 +70,8 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
 
       const indices: number[] = [];
 
+      const drawables: DrawablesMap = {};
+
       for (let i = startIndex; i <= endIndex; i++) {
         const page = pagesRef.current[i];
         const pageContentBox = getPageContentBox(page);
@@ -74,14 +79,17 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
           pageContentBox,
           selectionContentBox
         );
-        // contentToPdfBox(intersection, pageContentBox);
 
         if (intersection) {
           indices.push(i);
+          const pdfBox = contentToPdfBox(intersection, pageContentBox, 387.6);
+          drawables[i + 1] = new RectDrawable(pdfBox);
         }
       }
 
-      console.log(indices);
+      setPreviewDrawables(drawables);
+
+      // console.log(indices);
 
       // TODO: Convert box overlap to pdf coords
       // TODO: Create and pass RectDrawables to pages
@@ -159,6 +167,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
               ]
             : []
         }
+        previewDrawables={previewDrawables}
       />
     </div>
   );

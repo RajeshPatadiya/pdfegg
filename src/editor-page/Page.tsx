@@ -9,31 +9,43 @@ interface PageProps {
   pageHandle: PdfPageHandle | null;
   width: number;
   fallbackAspectRatio: number;
+  previewDrawable?: Drawable;
 }
 
-export const Page = React.forwardRef<HTMLDivElement, PageProps>(
-  ({ pageNumber, pageHandle, width, fallbackAspectRatio }, ref) => {
-    const pageDrawables = useDocumentPageDrawables(pageNumber);
+export const Page = React.memo(
+  React.forwardRef<HTMLDivElement, PageProps>(
+    (
+      { pageNumber, pageHandle, width, fallbackAspectRatio, previewDrawable },
+      ref
+    ) => {
+      const pageDrawables = useDocumentPageDrawables(pageNumber);
 
-    if (pageHandle === null) {
+      console.log("render");
+
+      if (pageHandle === null) {
+        return (
+          <PageContainer
+            ref={ref}
+            width={width}
+            height={width / fallbackAspectRatio}
+          />
+        );
+      }
+
       return (
-        <PageContainer
+        <RenderedPage
           ref={ref}
           width={width}
-          height={width / fallbackAspectRatio}
+          pageHandle={pageHandle}
+          drawables={
+            previewDrawable
+              ? [...pageDrawables, previewDrawable]
+              : pageDrawables
+          }
         />
       );
     }
-
-    return (
-      <RenderedPage
-        ref={ref}
-        width={width}
-        pageHandle={pageHandle}
-        drawables={pageDrawables}
-      />
-    );
-  }
+  )
 );
 
 interface PageContainerProps {

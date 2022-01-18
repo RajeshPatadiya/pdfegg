@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 
 interface Props {
   children: React.ReactElement[];
@@ -39,6 +39,15 @@ function Viewer({
     updateVisibleRange(initialVisibleRange);
   }, []);
 
+  const childrenRefs = useMemo(() => {
+    const refs: React.RefCallback<HTMLElement>[] = [];
+
+    for (let i = 0; i < children.length; i++) {
+      refs.push((el) => (itemsRef.current[i] = el!));
+    }
+    return refs;
+  }, [children.length]);
+
   return (
     <div
       ref={viewerRef}
@@ -63,7 +72,7 @@ function Viewer({
     >
       {children.map((child, i) =>
         React.cloneElement(child, {
-          ref: (el: HTMLElement) => (itemsRef.current[i] = el),
+          ref: childrenRefs[i],
         })
       )}
       {afterChildren}
