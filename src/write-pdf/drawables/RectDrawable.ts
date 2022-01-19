@@ -1,5 +1,5 @@
 import { PDFPage } from "pdf-lib";
-import { Box } from "../../common/Box";
+import { Box } from "../../common/logic";
 import Drawable from "./Drawable";
 import { hexToPdfColor } from "./utils";
 

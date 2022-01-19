@@ -7,13 +7,14 @@ import {
   useState,
 } from "react";
 import {
+  clamp,
+  Coord,
+  Size,
   Box,
   boxBottom,
   boxIntersection,
   boxScaleCoord,
-} from "../../common/Box";
-import { clamp } from "../../common/math";
-import { Coord, Size } from "../../common/Measure";
+} from "../../common/logic";
 import RectDrawable from "../../write-pdf/drawables/RectDrawable";
 import { PdfHandle } from "../../read-pdf";
 import { useDocumentOperationsDispatch } from "../DocumentOperationsContext";

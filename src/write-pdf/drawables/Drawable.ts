@@ -1,5 +1,5 @@
 import { PDFPage } from "pdf-lib";
-import { Box } from "../../common/Box";
+import { Box } from "../../common/logic";
 
 // Immutable drawable object.
 // Can be drawn both on canvas and PDF page.
