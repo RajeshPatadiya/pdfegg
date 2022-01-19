@@ -1,5 +1,5 @@
 import { PDFPageProxy } from "pdfjs-dist/types/src/display/api";
-import { Size, sizeAspectRatio } from "../common/Measure";
+import { Size, sizeAspectRatio } from "../common/logic";
 
 class PdfPageHandle {
   readonly size: Size;

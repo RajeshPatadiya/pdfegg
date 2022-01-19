@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useDebounce from "../../common/hooks/useDebounce";
-import { Size, sizeAspectRatio } from "../../common/Measure";
+import { Size, sizeAspectRatio } from "../../common/logic";
 import Drawable from "../../write-pdf/drawables/Drawable";
 import { PdfHandle, PdfPageHandle } from "../../read-pdf";
 import { Page } from "./Page";
