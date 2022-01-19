@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import HighDpiCanvas from "../common/HighDpiCanvas";
-import Drawable from "../pdf-modification/drawables/Drawable";
-import { PdfPageHandle } from "../pdf-rendering";
+import Drawable from "../write-pdf/drawables/Drawable";
+import { PdfPageHandle } from "../read-pdf";
 import { useDocumentPageDrawables } from "./DocumentOperationsContext";
 
 interface PageProps {

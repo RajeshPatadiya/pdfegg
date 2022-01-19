@@ -14,8 +14,8 @@ import {
 } from "../../common/Box";
 import { clamp } from "../../common/math";
 import { Coord, Size } from "../../common/Measure";
-import RectDrawable from "../../pdf-modification/drawables/RectDrawable";
-import { PdfHandle } from "../../pdf-rendering";
+import RectDrawable from "../../write-pdf/drawables/RectDrawable";
+import { PdfHandle } from "../../read-pdf";
 import { useDocumentOperationsDispatch } from "../DocumentOperationsContext";
 import { Tool } from "../Toolbar";
 import PdfViewer, { DrawablesMap } from "./PdfViewer";

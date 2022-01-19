@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react";
-import Drawable from "../pdf-modification/drawables/Drawable";
+import Drawable from "../write-pdf/drawables/Drawable";
 
 const DocumentOperationsContext = createContext<DocumentOperationsState>(null!);
 const DocumentOperationsDispatchContext =

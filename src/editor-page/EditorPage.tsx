@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PdfHandle } from "../pdf-rendering";
+import { PdfHandle } from "../read-pdf";
 import DownloadButton from "./DownloadButton";
 
 import logo from "./logo.svg";
