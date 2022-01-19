@@ -46,6 +46,18 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
   useEffect(() => {
     if (!contentTouchdown) return;
 
+    const getSelectionContentBox = (e: PointerEvent) => {
+      const pointerClientCoord: Coord = {
+        x: e.clientX,
+        y: e.clientY,
+      };
+      const pointerContentCoord = clientToContentCoord(
+        pointerClientCoord,
+        viewerRef.current!
+      );
+      return boxFromTwoPoints(contentTouchdown, pointerContentCoord);
+    };
+
     const getDrawablesMap = (selectionContentBox: Box) => {
       const drawablesMap: DrawablesMap = {};
       const { startIndex, endIndex } = visibleRangeRef.current;
@@ -76,18 +88,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
         return;
       }
 
-      const pointerClientCoord: Coord = {
-        x: e.clientX,
-        y: e.clientY,
-      };
-      const pointerContentCoord = clientToContentCoord(
-        pointerClientCoord,
-        viewerRef.current
-      );
-      const selectionContentBox = boxFromTwoPoints(
-        contentTouchdown,
-        pointerContentCoord
-      );
+      const selectionContentBox = getSelectionContentBox(e);
       const drawablesMap = getDrawablesMap(selectionContentBox);
 
       setPreviewDrawables(drawablesMap);
@@ -99,18 +100,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
       // start = min(touchdownPageIndex, visibleStart)
       // end = max(touchdownPageIndex, visibleEnd)
 
-      const pointerClientCoord: Coord = {
-        x: e.clientX,
-        y: e.clientY,
-      };
-      const pointerContentCoord = clientToContentCoord(
-        pointerClientCoord,
-        viewerRef.current!
-      );
-      const selectionContentBox = boxFromTwoPoints(
-        contentTouchdown,
-        pointerContentCoord
-      );
+      const selectionContentBox = getSelectionContentBox(e);
       // TODO: Calc full version of previewDrawables (from touchdown page)
       const drawablesMap = getDrawablesMap(selectionContentBox);
 
