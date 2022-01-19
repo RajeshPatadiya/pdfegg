@@ -58,7 +58,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
       return boxFromTwoPoints(contentTouchdown, pointerContentCoord);
     };
 
-    const getDrawablesMap = (
+    const getRectDrawablesMap = (
       selectionContentBox: Box,
       startPageIndex: number,
       endPageIndex: number
@@ -91,13 +91,16 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
       }
       const selectionContentBox = getSelectionContentBox(e);
       const visibleRange = visibleRangeRef.current;
-      const drawablesMap = getDrawablesMap(
-        selectionContentBox,
-        visibleRange.startIndex,
-        visibleRange.endIndex
-      );
 
-      setPreviewDrawables(drawablesMap);
+      if (tool === "rectangle") {
+        const drawablesMap = getRectDrawablesMap(
+          selectionContentBox,
+          visibleRange.startIndex,
+          visibleRange.endIndex
+        );
+        setPreviewDrawables(drawablesMap);
+      }
+
       setSelectionBox(selectionContentBox);
     };
 
@@ -105,21 +108,23 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
       const selectionContentBox = getSelectionContentBox(e);
       const visibleRange = visibleRangeRef.current;
       const touchdownPageIndex = touchdownPageIndexRef.current!;
-      const drawablesMap = getDrawablesMap(
-        selectionContentBox,
-        Math.min(touchdownPageIndex, visibleRange.startIndex),
-        Math.max(touchdownPageIndex, visibleRange.endIndex)
-      );
+
+      if (tool === "rectangle") {
+        const drawablesMap = getRectDrawablesMap(
+          selectionContentBox,
+          Math.min(touchdownPageIndex, visibleRange.startIndex),
+          Math.max(touchdownPageIndex, visibleRange.endIndex)
+        );
+        dispatch({
+          type: "ADD_DRAWABLES",
+          drawableForPage: drawablesMap,
+        });
+      }
 
       setContentTouchdown(null);
       setSelectionBox(null);
       setPreviewDrawables({});
       touchdownPageIndexRef.current = null;
-
-      dispatch({
-        type: "ADD_DRAWABLES",
-        drawableForPage: drawablesMap,
-      });
     };
 
     window.addEventListener("pointermove", onPointerMove);

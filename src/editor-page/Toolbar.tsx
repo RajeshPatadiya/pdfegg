@@ -3,7 +3,7 @@ import { MousePointer2, Type, Square } from "lucide-react";
 import styles from "./Toolbar.module.css";
 import classnames from "classnames";
 
-export type Tool = "move" | "text" | "square";
+export type Tool = "move" | "text" | "rectangle";
 
 interface Props {
   selectedTool: Tool;
@@ -28,8 +28,8 @@ function Toolbar({ selectedTool, onChanged }: Props) {
       </Well>
 
       <Well
-        selected={selectedTool === "square"}
-        onClick={(e) => onChanged("square")}
+        selected={selectedTool === "rectangle"}
+        onClick={(e) => onChanged("rectangle")}
       >
         <Square />
       </Well>
