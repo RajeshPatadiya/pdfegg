@@ -58,19 +58,21 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
       return boxFromTwoPoints(contentTouchdown, pointerContentCoord);
     };
 
-    const getDrawablesMap = (selectionContentBox: Box) => {
+    const getDrawablesMap = (
+      selectionContentBox: Box,
+      startPageIndex: number,
+      endPageIndex: number
+    ) => {
       const drawablesMap: DrawablesMap = {};
-      const { startIndex, endIndex } = visibleRangeRef.current;
       const pageElements = pagesRef.current;
       const sizes = pageSizesRef.current;
 
-      for (let i = startIndex; i <= endIndex; i++) {
+      for (let i = startPageIndex; i <= endPageIndex; i++) {
         const pageContentBox = getPageContentBox(pageElements[i]);
         const intersection = boxIntersection(
           pageContentBox,
           selectionContentBox
         );
-
         if (intersection) {
           const pdfBox = contentToPdfBox(
             intersection,
@@ -87,22 +89,27 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
       if (!contentTouchdown || !viewerRef.current) {
         return;
       }
-
       const selectionContentBox = getSelectionContentBox(e);
-      const drawablesMap = getDrawablesMap(selectionContentBox);
+      const visibleRange = visibleRangeRef.current;
+      const drawablesMap = getDrawablesMap(
+        selectionContentBox,
+        visibleRange.startIndex,
+        visibleRange.endIndex
+      );
 
       setPreviewDrawables(drawablesMap);
       setSelectionBox(selectionContentBox);
     };
 
     const onPointerUp = (e: PointerEvent) => {
-      // TODO: Use touchdown page to determine the affected page range
-      // start = min(touchdownPageIndex, visibleStart)
-      // end = max(touchdownPageIndex, visibleEnd)
-
       const selectionContentBox = getSelectionContentBox(e);
-      // TODO: Calc full version of previewDrawables (from touchdown page)
-      const drawablesMap = getDrawablesMap(selectionContentBox);
+      const visibleRange = visibleRangeRef.current;
+      const touchdownPageIndex = touchdownPageIndexRef.current!;
+      const drawablesMap = getDrawablesMap(
+        selectionContentBox,
+        Math.min(touchdownPageIndex, visibleRange.startIndex),
+        Math.max(touchdownPageIndex, visibleRange.endIndex)
+      );
 
       setContentTouchdown(null);
       setSelectionBox(null);
