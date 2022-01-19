@@ -46,6 +46,31 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
   useEffect(() => {
     if (!contentTouchdown) return;
 
+    const getDrawablesMap = (selectionContentBox: Box) => {
+      const drawablesMap: DrawablesMap = {};
+      const { startIndex, endIndex } = visibleRangeRef.current;
+      const pageElements = pagesRef.current;
+      const sizes = pageSizesRef.current;
+
+      for (let i = startIndex; i <= endIndex; i++) {
+        const pageContentBox = getPageContentBox(pageElements[i]);
+        const intersection = boxIntersection(
+          pageContentBox,
+          selectionContentBox
+        );
+
+        if (intersection) {
+          const pdfBox = contentToPdfBox(
+            intersection,
+            pageContentBox,
+            sizes[i]!.width
+          );
+          drawablesMap[i + 1] = new RectDrawable(pdfBox, "#cccccc");
+        }
+      }
+      return drawablesMap;
+    };
+
     const onPointerMove = (e: PointerEvent) => {
       if (!contentTouchdown || !viewerRef.current) {
         return;
@@ -63,48 +88,40 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
         contentTouchdown,
         pointerContentCoord
       );
+      const drawablesMap = getDrawablesMap(selectionContentBox);
 
-      const { startIndex, endIndex } = visibleRangeRef.current;
-
-      const drawables: DrawablesMap = {};
-      const sizes = pageSizesRef.current;
-
-      for (let i = startIndex; i <= endIndex; i++) {
-        const page = pagesRef.current[i];
-        const pageContentBox = getPageContentBox(page);
-        const intersection = boxIntersection(
-          pageContentBox,
-          selectionContentBox
-        );
-
-        if (intersection) {
-          const pdfBox = contentToPdfBox(
-            intersection,
-            pageContentBox,
-            sizes[i]!.width
-          );
-          drawables[i + 1] = new RectDrawable(pdfBox, "#cccccc");
-        }
-      }
-
-      setPreviewDrawables(drawables);
+      setPreviewDrawables(drawablesMap);
       setSelectionBox(selectionContentBox);
     };
 
-    const onPointerUp = (_: PointerEvent) => {
+    const onPointerUp = (e: PointerEvent) => {
       // TODO: Use touchdown page to determine the affected page range
       // start = min(touchdownPageIndex, visibleStart)
       // end = max(touchdownPageIndex, visibleEnd)
 
-      touchdownPageIndexRef.current = null;
+      const pointerClientCoord: Coord = {
+        x: e.clientX,
+        y: e.clientY,
+      };
+      const pointerContentCoord = clientToContentCoord(
+        pointerClientCoord,
+        viewerRef.current!
+      );
+      const selectionContentBox = boxFromTwoPoints(
+        contentTouchdown,
+        pointerContentCoord
+      );
+      // TODO: Calc full version of previewDrawables (from touchdown page)
+      const drawablesMap = getDrawablesMap(selectionContentBox);
 
       setContentTouchdown(null);
       setSelectionBox(null);
       setPreviewDrawables({});
+      touchdownPageIndexRef.current = null;
 
       dispatch({
         type: "ADD_DRAWABLES",
-        drawableForPage: previewDrawables,
+        drawableForPage: drawablesMap,
       });
     };
 
@@ -115,7 +132,7 @@ function InteractivePdfViewer({ pdfHandle, tool }: Props) {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
     };
-  }, [contentTouchdown, previewDrawables]);
+  }, [contentTouchdown]);
 
   const onPointerDown: PointerEventHandler = useCallback((e) => {
     e.preventDefault();
