@@ -4,6 +4,7 @@ interface HighDpiCanvasProps {
   width: number;
   height: number;
   render: (canvasContext: CanvasRenderingContext2D) => void;
+  preScaleRender?: boolean;
   onMouseDown?: MouseEventHandler<HTMLCanvasElement>;
   onMouseMove?: MouseEventHandler<HTMLCanvasElement>;
   onMouseUp?: MouseEventHandler<HTMLCanvasElement>;
@@ -14,7 +15,8 @@ function HighDpiCanvas({
   width,
   height,
   render,
-  ...eventHandlers
+  preScaleRender = true,
+  ...otherProps
 }: HighDpiCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -26,9 +28,14 @@ function HighDpiCanvas({
   useEffect(() => {
     const canvas = canvasRef.current!;
     const context = canvas.getContext("2d")!;
-
     context.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (preScaleRender) {
+      context.scale(dpr, dpr);
+    }
+
     render(context);
+    context.resetTransform();
   }, [canvasWidth, canvasHeight, render]);
 
   return (
@@ -37,7 +44,7 @@ function HighDpiCanvas({
       width={canvasWidth}
       height={canvasHeight}
       style={canvasStyle}
-      {...eventHandlers}
+      {...otherProps}
     />
   );
 }

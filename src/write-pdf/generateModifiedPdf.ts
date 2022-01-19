@@ -1,21 +1,21 @@
 import { PDFDocument } from "pdf-lib";
-import Operation from "./operations/Operation";
+import Drawable from "./drawables/Drawable";
 
 async function generateModifiedPdf(
   pdfBytes: Uint8Array,
-  operationsPerPage: {
-    [pageNumber: number]: Operation[];
+  drawables: {
+    [pageNumber: number]: Drawable[];
   }
 ) {
   const pdfDoc = await PDFDocument.load(pdfBytes);
   const pages = pdfDoc.getPages();
 
-  console.log(operationsPerPage);
+  console.log(drawables);
 
-  for (const [key, operations] of Object.entries(operationsPerPage)) {
+  for (const [key, ds] of Object.entries(drawables)) {
     const pageNum = Number(key);
     const page = pages[pageNum - 1];
-    operations.forEach((op) => op.applyOnPdfPage(page));
+    ds.forEach((d) => d.drawOnPdfPage(page));
   }
 
   return await pdfDoc.save();

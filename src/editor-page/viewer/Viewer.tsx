@@ -1,47 +1,61 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 
-interface WindowProps {
+interface Props {
   children: React.ReactElement[];
+  afterChildren: React.ReactElement[];
+  visibleRangeRef: React.MutableRefObject<VisibleRange>;
+  viewerRef: React.RefObject<HTMLDivElement>;
+  itemsRef: React.MutableRefObject<HTMLElement[]>;
   onVisibleChanged: (
     visibleStartIndex: number,
     visibleEndIndex: number
   ) => void;
 }
 
-interface VisibleRange {
+export interface VisibleRange {
   startIndex: number;
   endIndex: number;
 }
 
-function Window({ children, onVisibleChanged }: WindowProps) {
-  const [visibleRange, setVisibleRange] = useState<VisibleRange>({
-    startIndex: 0,
-    endIndex: 0,
-  });
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const itemsRef = useRef<Array<HTMLElement>>([]);
-
+function Viewer({
+  children,
+  afterChildren,
+  visibleRangeRef,
+  viewerRef,
+  itemsRef,
+  onVisibleChanged,
+}: Props) {
   function updateVisibleRange(newVisibleRange: VisibleRange) {
+    visibleRangeRef.current = newVisibleRange;
     onVisibleChanged(newVisibleRange.startIndex, newVisibleRange.endIndex);
-    setVisibleRange(newVisibleRange);
   }
 
   useEffect(() => {
     const initialVisibleRange = getVisibleItemRange(
-      viewportRef.current!,
+      viewerRef.current!,
       itemsRef.current,
-      visibleRange
+      visibleRangeRef.current
     );
     updateVisibleRange(initialVisibleRange);
   }, []);
 
+  const childrenRefs = useMemo(() => {
+    const refs: React.RefCallback<HTMLElement>[] = [];
+
+    for (let i = 0; i < children.length; i++) {
+      refs.push((el) => (itemsRef.current[i] = el!));
+    }
+    return refs;
+  }, [children.length]);
+
   return (
     <div
-      ref={viewportRef}
-      style={{ height: "100%", overflow: "scroll" }}
+      ref={viewerRef}
+      style={{ height: "100%", overflow: "scroll", position: "relative" }}
       onScroll={(e) => {
         console.assert(itemsRef.current.length === children.length);
 
+        const visibleRange = visibleRangeRef.current;
         const newVisibleRange = getVisibleItemRange(
           e.currentTarget,
           itemsRef.current,
@@ -58,26 +72,27 @@ function Window({ children, onVisibleChanged }: WindowProps) {
     >
       {children.map((child, i) =>
         React.cloneElement(child, {
-          ref: (el: HTMLElement) => (itemsRef.current[i] = el),
+          ref: childrenRefs[i],
         })
       )}
+      {afterChildren}
     </div>
   );
 }
 
 function getVisibleItemRange(
-  viewport: HTMLElement,
+  viewer: HTMLElement,
   items: HTMLElement[],
   prevVisibleRange: VisibleRange
 ): VisibleRange {
-  const viewportTop = viewport.scrollTop;
-  const viewportBottom = viewportTop + viewport.clientHeight;
+  const viewportTop = viewer.scrollTop;
+  const viewportBottom = viewportTop + viewer.clientHeight;
 
   function getItemPosition(item: HTMLElement): {
     top: number;
     bottom: number;
   } {
-    const top = item.offsetTop - viewport.offsetTop;
+    const top = item.offsetTop - viewer.offsetTop;
     const bottom = top + item.clientHeight;
     return { top, bottom };
   }
@@ -131,4 +146,4 @@ function getVisibleItemRange(
   };
 }
 
-export default Window;
+export default Viewer;

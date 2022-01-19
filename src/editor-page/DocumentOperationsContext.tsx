@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react";
-import Operation from "../pdf-generating/operations/Operation";
+import Drawable from "../write-pdf/drawables/Drawable";
 
 const DocumentOperationsContext = createContext<DocumentOperationsState>(null!);
 const DocumentOperationsDispatchContext =
@@ -9,8 +9,10 @@ export function useDocumentOperations() {
   return useContext(DocumentOperationsContext);
 }
 
-export function useDocumentPageOperations(pageNumber: number) {
-  return useContext(DocumentOperationsContext).operationsPerPage[pageNumber];
+export function useDocumentPageDrawables(pageNumber: number) {
+  return (
+    useContext(DocumentOperationsContext).drawablesOnPage[pageNumber] || []
+  );
 }
 
 export function useDocumentOperationsDispatch() {
@@ -44,21 +46,28 @@ export function DocumentOperationsProvider({
 
 // Contains document manipulations that can be undone/redone.
 type DocumentOperationsState = {
-  operationsPerPage: {
-    [pageNumber: number]: Operation[];
+  drawablesOnPage: {
+    [pageNumber: number]: Drawable[];
   };
 };
 type DocumentOperationsDispatch = React.Dispatch<DocumentOperationsAction>;
-type DocumentOperationsAction = UpdatePageOperations;
+type DocumentOperationsAction = UpdatePageDrawables | AddDrawables;
 
-interface UpdatePageOperations {
-  type: "UPDATE_PAGE_OPERATIONS";
+interface UpdatePageDrawables {
+  type: "UPDATE_PAGE_DRAWABLES";
   pageNumber: number;
-  updatedOperations: Operation[];
+  updatedDrawables: Drawable[];
+}
+
+interface AddDrawables {
+  type: "ADD_DRAWABLES";
+  drawableForPage: {
+    [pageNumber: number]: Drawable;
+  };
 }
 
 const initialState: DocumentOperationsState = {
-  operationsPerPage: {},
+  drawablesOnPage: {},
 };
 
 function reducer(
@@ -66,13 +75,29 @@ function reducer(
   action: DocumentOperationsAction
 ): DocumentOperationsState {
   switch (action.type) {
-    case "UPDATE_PAGE_OPERATIONS": {
+    case "UPDATE_PAGE_DRAWABLES": {
       return {
         ...state,
-        operationsPerPage: {
-          ...state.operationsPerPage,
-          [action.pageNumber]: action.updatedOperations,
+        drawablesOnPage: {
+          ...state.drawablesOnPage,
+          [action.pageNumber]: action.updatedDrawables,
         },
+      };
+    }
+    case "ADD_DRAWABLES": {
+      const drawablesOnPage = {
+        ...state.drawablesOnPage,
+      };
+      for (const [key, addedDrawable] of Object.entries(
+        action.drawableForPage
+      )) {
+        const pageNum = Number(key);
+        const prevDrawables = drawablesOnPage[pageNum] || [];
+        drawablesOnPage[pageNum] = [...prevDrawables, addedDrawable];
+      }
+      return {
+        ...state,
+        drawablesOnPage,
       };
     }
   }

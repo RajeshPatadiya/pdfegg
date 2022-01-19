@@ -1,5 +1,5 @@
 import { HexColorPicker } from "react-colorful";
-import useDebounce from "../common/useDebounce";
+import useDebounce from "../common/hooks/useDebounce";
 
 interface Props {
   color: string;
