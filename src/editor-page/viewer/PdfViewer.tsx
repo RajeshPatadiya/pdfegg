@@ -3,7 +3,7 @@ import useDebounce from "../../common/hooks/useDebounce";
 import { Size, sizeAspectRatio } from "../../common/Measure";
 import Drawable from "../../write-pdf/drawables/Drawable";
 import { PdfHandle, PdfPageHandle } from "../../read-pdf";
-import { Page } from "./../Page";
+import { Page } from "./Page";
 import Viewer, { VisibleRange } from "./Viewer";
 
 export type DrawablesMap = {
